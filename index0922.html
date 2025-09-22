@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>品質處 Prompt Library – 維護版 (V6.0 - 雲端協作版)</title>
+  <style>
+    :root{
+      --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(160deg, var(--bg), #030712 60%); color:var(--text);
+    }
+    .wrap{max-width:1200px; margin:40px auto; padding:0 16px;}
+    header{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;}
+    .title{font-size: clamp(22px, 3vw, 34px); font-weight:800; letter-spacing:.4px;}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted);}
+    .grid{display:grid; gap:16px; grid-template-columns: 1fr;}
+    .panel{border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,0.03);}
+    .panel h2{margin:0; padding:16px 18px; font-size:18px; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.03);}
+    .panel .content{padding:16px 18px; color:var(--text);}
+    .muted{color:var(--muted);}
+    .toolbar{display:flex; gap:10px; align-items:center; flex-wrap: wrap; justify-content: space-between;}
+    .search-controls { display:flex; gap: 10px; flex-grow: 1; min-width: 300px;}
+    .actions-controls { display:flex; gap: 10px; }
+    .search{position: relative; flex-grow: 1;}
+    input[type="text"], textarea, select {
+      width:100%; background:#0b1220; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:10px; outline:none; box-sizing: border-box;
+    }
+    input[type="text"]{padding-right: 35px;}
+    .clear-search-btn {
+        position: absolute; right: 1px; top: 1px; bottom: 1px; background: none; border: none;
+        color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 10px; display: none;
+    }
+    .clear-search-btn:hover { color: var(--text); }
+    .btn{appearance:none; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#00131a; font-weight:700; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .05s ease, background .2s;}
+    .btn-action{background:var(--accent); color:white; padding:8px 12px;}
+    .btn-danger{background:var(--btn-danger); color:white; padding:8px 12px;}
+    .btn-success{background:var(--btn-success); color:white; padding:8px 12px;}
+    .btn:active{transform:scale(0.98);}
+    .btn-primary { padding: 10px 18px; }
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px;}
+    thead th{position:sticky; top:0; background:#0b1220; text-align:left; padding:12px; font-size:13px; color:var(--muted); border-bottom:1px solid var(--border);}
+    tbody td{vertical-align:top; padding:14px 12px; border-bottom:1px dashed rgba(148,163,184,0.25);}
+    .prompt-row {background:rgba(255,255,255,0.02);}
+    .task{font-weight:700;}
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .chip{background:var(--chip); border:1px solid var(--border); padding:4px 8px; border-radius:999px; font-size:11px; color:var(--muted); display: inline-block;}
+    .chip.clickable { cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+    .chip.clickable:hover { background: var(--border); color: var(--text); }
+    .chip.active { background-color: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
+    .prompt{white-space:pre-wrap; max-height: 90px; overflow: hidden; transition: max-height .3s;}
+    .row-tools{display:flex; gap:8px; margin-top:8px;}
+    .ghost{background:transparent; color:var(--muted); border:1px solid var(--border);}
+    .small{font-size:12px;}
+    .footer{color:var(--muted); font-size:12px; text-align:center; margin:24px 0 40px;}
+    .hl{color:var(--accent);}
+    .note{font-size:14px; line-height:1.8;}
+    .note-columns { display: flex; gap: 24px; }
+    .note-column { flex: 1; min-width: 0;}
+    @media (max-width: 768px) { .note-columns { flex-direction: column; } }
+    .note h4 { color: var(--accent); margin-top: 20px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px;}
+    .note h4:first-child { margin-top: 0; }
+    .note ul { padding-left: 20px; margin: 0; }
+    .note li { margin-bottom: 12px; }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; font-size: 0.9em;}
+    .modal-overlay{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; visibility:hidden; transition:opacity .3s, visibility .3s;}
+    .modal-overlay.active{opacity:1; visibility:visible;}
+    .modal-container{background:var(--panel); border:1px solid var(--border); border-radius:14px; width:90%; max-width:800px; max-height:90vh; display:flex; flex-direction:column; transform:scale(0.95); transition:transform .3s;}
+    .active .modal-container{transform:scale(1);}
+    .modal-header{padding:16px 24px; border-bottom:1px solid var(--border); font-size:18px; font-weight:700; display:flex; justify-content:space-between; align-items:center;}
+    .modal-header .close-btn{cursor:pointer; font-size:24px; color:var(--muted); background:none; border:none;}
+    .modal-content{padding:24px; overflow-y:auto; flex:1;}
+    .modal-footer{padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:12px; align-items:center;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block; margin-bottom:8px; font-size:14px; color:var(--muted);}
+    .history-select{width:auto; min-width:200px; margin-right: auto;}
+    .toast-container{position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:10px;}
+    .toast{padding:12px 20px; border-radius:8px; color:white; font-size:14px; opacity:0; transform:translateX(100%); transition:all .4s ease; box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+    .toast.show{opacity:1; transform:translateX(0);}
+    .toast.success{background-color:var(--btn-success);}
+    .toast.error{background-color:var(--btn-danger);}
+    .meta-container{display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px;}
+    .meta-item{font-size:11px; color:var(--muted);}
+    #categoryList { list-style: none; padding: 0; max-height: 40vh; overflow-y: auto;}
+    #categoryList li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
+    #categoryList li:nth-child(odd) { background: rgba(255,255,255,0.03); }
+    #newCategoryForm { display: flex; gap: 10px; margin-top: 20px;}
+    #newCategoryInput { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.0)</div>
+      <div class="badge">內部共享・標準化・可持續改進</div>
+    </header>
+
+    <div class="grid section">
+        <section class="panel">
+            <h2>使用說明與注意事項</h2>
+            <div class="content note note-columns">
+                <div class="note-column">
+                    <h4>雲端協作版說明</h4>
+                    <ul>
+                        <li><b>即時同步：</b> 本版本已連接至雲端資料庫，任何使用者對提示詞的修改都會**即時同步**給所有正在使用此頁面的同事。</li>
+                        <li><b>跨裝置存取：</b> 您可以在任何有權限存取此網址的電腦上，看到並編輯**同一個**、永遠最新的提示詞庫。</li>
+                        <li><b>資料安全：</b> 資料儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
+                    </ul>
+                </div>
+                <div class="note-column">
+                    <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
+                    <ul>
+                        <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
+                        <li><b>舊資料不相容：</b> 您之前版本儲存在個人電腦的資料**不會**自動轉移，團隊將從一個全新的、共享的資料庫開始。</li>
+                         <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據貼入此工具。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>搜尋與篩選</h2>
+            <div class="content toolbar">
+                <div class="search-controls">
+                    <div class="search"><input id="search" type="text" placeholder="🔎 篩選關鍵字…" /><button id="clearSearchBtn" class="clear-search-btn" title="清除篩選">&times;</button></div>
+                    <select id="categoryFilter"><option value="all">全部分類</option></select>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>功能操作</h2>
+            <div class="content toolbar">
+                <div class="actions-controls">
+                    <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
+                    <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>提示詞庫</h2>
+            <div class="content">
+              <div id="categoryChipsContainer" class="chips"></div>
+              <table id="lib">
+                <thead><tr><th style="width:5%">#</th><th style="width:30%">任務目標</th><th>Prompt 詞</th><th style="width:12%">操作</th></tr></thead>
+                <tbody id="initial-data" style="display: none;">
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規快速摘要＋行動清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">你是{{目標市場}}的{{適用法規}}專家。請以{{語言}}輸出：<br>1) 條款重點（條號＋要點，最多10條）；<br>2) 對{{產品型號}}在{{應用場景}}的影響；<br>3) 必要測試/文件清單（實驗室、報告、標示、聲明）；<br>4) 風險點與避免措施；<br>5) 接下來7天的行動計畫（負責人/輸出物/截止日）。<br>限制：引用條款標示版本與日期：{{標準版本與日期}}。</div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商變更（PCN）風險評估<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">針對供應商PCN：{{PCN編號/變更內容}}，請輸出風險評估：受影響料號/功能層級、配方/製程/尺寸變動分析、替代料相容性、需要の驗證計畫（測試項目/樣本量/時間表）、庫存與切換節點建議、跨部門RACI。</div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr>
+                  </tbody>
+                <tbody id="prompt-list"></tbody>
+              </table>
+            </div>
+        </section>
+        <p class="footer">© 2025 品質處 Prompt Library – 雲端協作版</p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="promptModal"><div class="modal-container"><div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn">&times;</button></div><div class="modal-content"><form id="promptForm"><input type="hidden" id="promptId"><div class="form-group"><label for="taskInput">任務目標</label><input type="text" id="taskInput" required></div><div class="form-group"><label for="categoryInput">分類</label><select id="categoryInput" required></select></div><div class="form-group"><label for="promptInput">Prompt 詞</label><textarea id="promptInput" rows="10" required></textarea></div><div class="form-group"><label for="authorInput">建立者 / 修改者</label><input type="text" id="authorInput" required></div><div class="modal-footer"><select id="historySelect" class="small history-select" disabled></select><button type="button" class="btn" id="saveBtn">儲存</button></div></form></div></div></div>
+  <div class="modal-overlay" id="categoryModal"><div class="modal-container" style="max-width: 500px;"><div class="modal-header"><h3 id="categoryModalTitle">管理分類</h3><button class="close-btn">&times;</button></div><div class="modal-content"><ul id="categoryList"></ul><form id="newCategoryForm"><input type="text" id="newCategoryInput" placeholder="輸入新分類名稱..." required><button type="submit" class="btn btn-action small">新增</button></form></div><div class="modal-footer"><button class="btn ghost" id="closeCategoryModalBtn">完成</button></div></div></div>
+  <div id="toastContainer" class="toast-container"></div>
+  <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr></template>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    class PromptLibraryApp {
+      constructor() {
+        this.elements = {
+            tableBody: document.getElementById('prompt-list'), initialDataSource: document.getElementById('initial-data'),
+            searchInput: document.getElementById('search'), clearSearchBtn: document.getElementById('clearSearchBtn'), categoryFilter: document.getElementById('categoryFilter'),
+            categoryChipsContainer: document.getElementById('categoryChipsContainer'),
+            addNewBtn: document.getElementById('addNew'), manageCategoriesBtn: document.getElementById('manageCategoriesBtn'),
+            promptModal: { self: document.getElementById('promptModal'), title: document.getElementById('modalTitle'), form: document.getElementById('promptForm'), idInput: document.getElementById('promptId'), taskInput: document.getElementById('taskInput'), categoryInput: document.getElementById('categoryInput'), promptInput: document.getElementById('promptInput'), authorInput: document.getElementById('authorInput'), historySelect: document.getElementById('historySelect'), saveBtn: document.getElementById('saveBtn'), },
+            categoryModal: { self: document.getElementById('categoryModal'), list: document.getElementById('categoryList'), form: document.getElementById('newCategoryForm'), input: document.getElementById('newCategoryInput'), closeBtn: document.getElementById('closeCategoryModalBtn'), },
+            rowTemplate: document.getElementById('prompt-row-template'),
+        };
+        this.prompts = []; this.categories = []; this.isContentDirty = false;
+        this.activeCategories = [];
+        this.db = null; // Firestore instance
+      }
+
+      init() {
+        this._initFirebase();
+        this._setupRealtimeListeners();
+        this._bindEventListeners();
+      }
+
+      _initFirebase() {
+        // --- 雲端資料庫設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQDorsdx2Cetyp46riQC7i_xB2dMCvuYc",
+            authDomain: "qmd-prompt-library.firebaseapp.com",
+            projectId: "qmd-prompt-library",
+            storageBucket: "qmd-prompt-library.firebasestorage.app",
+            messagingSenderId: "622746077507",
+            appId: "1:622746077507:web:e5a1089f93dbf4dd5807f6",
+            measurementId: "G-KHGRGT7W30"
+        };
+        // --- 結束設定 ---
+        try {
+            firebase.initializeApp(firebaseConfig);
+            this.db = firebase.firestore();
+        } catch (e) {
+            console.error("Firebase 初始化失敗:", e);
+            alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。");
+        }
+      }
+
+      _setupRealtimeListeners() {
+        if (!this.db) return;
+
+        // Listen for categories
+        this.db.collection("categories").orderBy("name").onSnapshot(snapshot => {
+            this.categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            this._populateCategoryDropdowns();
+            this._renderCategoryChips();
+            this._renderTable();
+        });
+
+        // Listen for prompts
+        this.db.collection("prompts").orderBy("createdDate", "desc").onSnapshot(snapshot => {
+            if (snapshot.empty) {
+                this._seedDataToFirestore();
+            } else {
+                this.prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                this._renderTable();
+            }
+        });
+      }
+
+      async _seedDataToFirestore() {
+        console.log("資料庫是空的，正在從 HTML 植入初始資料到雲端...");
+        if (!this.db) return;
+        const rows = this.elements.initialDataSource.querySelectorAll('tr');
+        const categories = new Set();
+        const promptsToSeed = [];
+
+        rows.forEach(row => {
+            const categoryText = row.querySelector('.cat').innerText.trim();
+            const taskCell = row.querySelector('.task');
+            const taskText = taskCell.childNodes[0].nodeValue.trim();
+            categories.add(categoryText);
+            promptsToSeed.push({
+                task: taskText, category: categoryText, prompt: row.querySelector('.prompt .mono').innerText.trim(),
+                author: 'System', createdDate: new Date(), lastModified: new Date(),
+                copyCount: 0, history: []
+            });
+        });
+
+        const batch = this.db.batch();
+        // Add categories
+        [...categories].sort().forEach(catName => {
+            const catRef = this.db.collection("categories").doc();
+            batch.set(catRef, { name: catName });
+        });
+        // Add prompts
+        promptsToSeed.forEach(prompt => {
+            const promptRef = this.db.collection("prompts").doc();
+            batch.set(promptRef, prompt);
+        });
+
+        try {
+            await batch.commit();
+            this._showToast("已成功將預設提示詞庫上傳至雲端！");
+        } catch (e) {
+            console.error("植入初始資料失敗:", e);
+        }
+      }
+
+      _renderTable() {
+        const { tableBody, searchInput } = this.elements; tableBody.innerHTML = '';
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const filtered = this.prompts.filter(p => {
+            const matchesCategory = this.activeCategories.length === 0 || this.activeCategories.includes(p.category);
+            const matchesSearch = !searchTerm || p.task.toLowerCase().includes(searchTerm) || p.prompt.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+        });
+        if (filtered.length === 0) { tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 32px;">找不到符合條件的提示詞。</td></tr>`; return; }
+
+        filtered.forEach((prompt, index) => {
+            const row = this.elements.rowTemplate.content.cloneNode(true);
+            const tr = row.querySelector('.prompt-row');
+            tr.dataset.id = prompt.id;
+            row.querySelector('.id').textContent = index + 1;
+            row.querySelector('.task').textContent = prompt.task;
+            const categoryLabel = row.querySelector('.category-label');
+            categoryLabel.textContent = prompt.category;
+            categoryLabel.dataset.category = prompt.category;
+            row.querySelector('.prompt .mono').innerHTML = prompt.prompt.replace(/\n/g, '<br>');
+            row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
+            row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
+            row.querySelector('.last-modified').textContent = `更新: ${new Date(prompt.lastModified.toDate()).toLocaleDateString()}`;
+            tableBody.appendChild(row);
+        });
+        this._updateActiveFilters();
+      }
+      
+      _populateCategoryDropdowns() {
+        const { categoryFilter, promptModal } = this.elements;
+        const { categoryInput } = promptModal;
+        const currentFilterValue = categoryFilter.value;
+        
+        categoryFilter.innerHTML = '<option value="all">全部分類</option>';
+        this.categories.forEach(cat => { categoryFilter.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
+        if(this.categories.some(c => c.name === currentFilterValue)) { categoryFilter.value = currentFilterValue; }
+
+        const currentModalValue = categoryInput.value;
+        categoryInput.innerHTML = '';
+        this.categories.forEach(cat => { categoryInput.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
+        if(this.categories.some(c => c.name === currentModalValue)) { categoryInput.value = currentModalValue; }
+      }
+
+      _renderCategoryChips() {
+          const { categoryChipsContainer } = this.elements;
+          categoryChipsContainer.innerHTML = '';
+          const allChip = document.createElement('span');
+          allChip.className = 'chip clickable'; allChip.textContent = '全部分類'; allChip.dataset.category = 'all';
+          categoryChipsContainer.appendChild(allChip);
+          this.categories.forEach(cat => {
+              const chip = document.createElement('span');
+              chip.className = 'chip clickable'; chip.textContent = cat.name; chip.dataset.category = cat.name;
+              categoryChipsContainer.appendChild(chip);
+          });
+          this._updateActiveFilters();
+      }
+
+      _updateActiveFilters() {
+          const { categoryFilter, categoryChipsContainer } = this.elements;
+          categoryChipsContainer.querySelectorAll('.chip').forEach(chip => {
+              const category = chip.dataset.category;
+              const isActive = (this.activeCategories.length === 0 && category === 'all') || this.activeCategories.includes(category);
+              chip.classList.toggle('active', isActive);
+          });
+          if (this.activeCategories.length === 1) {
+              categoryFilter.value = this.activeCategories[0];
+          } else {
+              categoryFilter.value = 'all';
+          }
+      }
+
+      _renderCategoryList() {
+        const { list } = this.elements.categoryModal; list.innerHTML = '';
+        this.categories.forEach(cat => {
+            const isUsed = this.prompts.some(p => p.category === cat.name);
+            list.innerHTML += `<li><span>${cat.name}</span><button class="btn small btn-danger" data-id="${cat.id}" ${isUsed ? 'disabled title="分類使用中，無法刪除"' : ''}>刪除</button></li>`;
+        });
+      }
+
+      _openModal(modalElement) { modalElement.classList.add('active'); }
+      _closeModal(modalElement) { modalElement.classList.remove('active'); }
+
+      _bindEventListeners() {
+        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, categoryChipsContainer } = this.elements;
+        const { self: promptModal, saveBtn } = this.elements.promptModal;
+        const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
+
+        searchInput.addEventListener('input', () => { this._toggleClearSearchBtn(); this._renderTable(); });
+        clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); this._toggleClearSearchBtn(); this._renderTable(); });
+        categoryFilter.addEventListener('change', (e) => {
+            this.activeCategories = e.target.value === 'all' ? [] : [e.target.value];
+            this._updateActiveFilters(); this._renderTable();
+        });
+        categoryChipsContainer.addEventListener('click', e => {
+            const target = e.target;
+            if (target.classList.contains('chip')) {
+                const category = target.dataset.category;
+                if (category === 'all') { this.activeCategories = []; } 
+                else {
+                    const index = this.activeCategories.indexOf(category);
+                    if (index > -1) { this.activeCategories.splice(index, 1); } 
+                    else { this.activeCategories.push(category); }
+                }
+                this._updateActiveFilters(); this._renderTable();
+            }
+        });
+        addNewBtn.addEventListener('click', () => this._openPromptModal('add'));
+        manageCategoriesBtn.addEventListener('click', () => { this._renderCategoryList(); this._openModal(categoryModal); });
+        this.elements.tableBody.addEventListener('click', e => this._handleTableClick(e));
+        promptModal.addEventListener('click', e => { if (e.target === promptModal || e.target.classList.contains('close-btn')) this._closePromptModal(); });
+        this.elements.promptModal.form.addEventListener('input', () => { this.isContentDirty = true; });
+        saveBtn.addEventListener('click', () => this._savePrompt());
+        this.elements.promptModal.historySelect.addEventListener('change', (e) => this._restoreHistory(e));
+        categoryModal.addEventListener('click', e => { if (e.target === categoryModal || e.target.classList.contains('close-btn') || e.target === closeCategoryModalBtn) this._closeModal(categoryModal); });
+        categoryForm.addEventListener('submit', e => { e.preventDefault(); this._addNewCategory(); });
+        categoryList.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') this._deleteCategory(e.target.dataset.id); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && promptModal.classList.contains('active')) this._closePromptModal(); });
+        window.addEventListener('beforeunload', e => { if (this.isContentDirty) { e.preventDefault(); e.returnValue = ''; } });
+      }
+
+      _handleTableClick(e) {
+          const row = e.target.closest('.prompt-row'); if (!row) return;
+          const id = row.dataset.id;
+          if (e.target.closest('.copy')) {
+              const prompt = this.prompts.find(p => p.id === id);
+              if (prompt) {
+                  navigator.clipboard.writeText(prompt.prompt);
+                  this.db.collection("prompts").doc(id).update({ copyCount: firebase.firestore.FieldValue.increment(1) });
+                  this._showToast('已成功複製到剪貼簿！');
+              }
+          } else if (e.target.closest('.edit')) {
+              this._openPromptModal('edit', id);
+          } else if (e.target.closest('.delete')) {
+              if (confirm('確定要刪除這條提示詞嗎？')) {
+                  this.db.collection("prompts").doc(id).delete();
+                  this._showToast('提示詞已刪除', 'error');
+              }
+          }
+      }
+
+      _openPromptModal(mode = 'add', id = null) {
+        const { title, idInput, taskInput, categoryInput, promptInput, authorInput, historySelect } = this.elements.promptModal;
+        this.isContentDirty = false;
+        idInput.value = ''; taskInput.value = ''; promptInput.value = ''; authorInput.value = '';
+        categoryInput.value = '';
+        
+        if (mode === 'edit') {
+          const prompt = this.prompts.find(p => p.id === id);
+          if (!prompt) return;
+          title.textContent = '編輯提示詞'; idInput.value = prompt.id; taskInput.value = prompt.task;
+          const categoryExists = this.categories.some(c => c.name === prompt.category);
+          if (!categoryExists) {
+              const tempOption = document.createElement('option');
+              tempOption.value = prompt.category; tempOption.textContent = `${prompt.category} (已刪除)`;
+              categoryInput.appendChild(tempOption);
+          }
+          categoryInput.value = prompt.category; 
+          promptInput.value = prompt.prompt; authorInput.value = prompt.author || '';
+          this._populateHistory(prompt);
+        } else {
+          title.textContent = '新增提示詞';
+          if(this.categories.length > 0) { categoryInput.value = this.categories[0].name; }
+          historySelect.innerHTML = '<option value="">無歷史版本</option>'; historySelect.disabled = true;
+          authorInput.value = localStorage.getItem('promptLibraryAuthor') || '';
+        }
+        this._openModal(this.elements.promptModal.self); taskInput.focus();
+      }
+
+      _closePromptModal() {
+        if (this.isContentDirty && !confirm('您有未儲存的變更，確定要關閉嗎？')) { return; }
+        this._closeModal(this.elements.promptModal.self);
+      }
+
+      _savePrompt() {
+          const { form, idInput, taskInput, categoryInput, promptInput, authorInput } = this.elements.promptModal;
+          if (!form.checkValidity()) { form.reportValidity(); this._showToast("儲存失敗：請檢查所有必填欄位！", "error"); return; }
+          const id = idInput.value;
+          const data = {
+              task: taskInput.value.trim(), category: categoryInput.value, prompt: promptInput.value.trim(),
+              author: authorInput.value.trim(), lastModified: new Date()
+          };
+
+          if (id) {
+              const promptToUpdate = this.prompts.find(p => p.id === id);
+              const oldHistory = promptToUpdate.history || [];
+              oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
+              if (oldHistory.length > 10) oldHistory.pop();
+              data.history = oldHistory;
+              this.db.collection("prompts").doc(id).update(data);
+              this._showToast('提示詞已更新！');
+          } else {
+              data.createdDate = new Date(); data.copyCount = 0; data.history = [];
+              this.db.collection("prompts").add(data);
+              this._showToast('已成功新增提示詞！');
+          }
+          localStorage.setItem('promptLibraryAuthor', data.author);
+          this.isContentDirty = false;
+          this._closeModal(this.elements.promptModal.self);
+      }
+      
+      _addNewCategory() {
+          const { input } = this.elements.categoryModal; const newCat = input.value.trim();
+          if (newCat && !this.categories.some(c => c.name === newCat)) {
+              this.db.collection("categories").add({ name: newCat });
+              input.value = ''; this._showToast('已新增分類！');
+          } else { this._showToast(newCat ? '分類已存在' : '分類名稱不能為空', 'error'); }
+      }
+      
+      _deleteCategory(id) {
+          if (confirm('確定要刪除這個分類嗎？')) {
+            this.db.collection("categories").doc(id).delete();
+            this._showToast('分類已刪除', 'error');
+          }
+      }
+      
+      _restoreHistory(e) {
+        const { idInput, promptInput, historySelect } = this.elements.promptModal;
+        const id = idInput.value; const index = e.target.value;
+        if (id && index !== '') {
+            const prompt = this.prompts.find(p => p.id === id);
+            const historicVersion = prompt.history[index];
+            if (historicVersion && confirm('確定要還原到這個歷史版本嗎？')) {
+                promptInput.value = historicVersion.prompt; this._showToast('已還原歷史版本內容。');
+            }
+            historySelect.value = '';
+        }
+      }
+      
+      _showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`; toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3000);
+      }
+      
+      _toggleClearSearchBtn() { this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none'; }
+      
+      _populateHistory(prompt) {
+          const { historySelect } = this.elements.promptModal;
+          historySelect.innerHTML = '<option value="">檢視歷史版本...</option>';
+          if (prompt.history && prompt.history.length > 0) {
+            prompt.history.forEach((h, index) => { 
+                const date = h.modifiedDate.toDate ? h.modifiedDate.toDate() : new Date(h.modifiedDate);
+                historySelect.innerHTML += `<option value="${index}">版本 #${prompt.history.length - index} (${date.toLocaleString()})</option>`;
+            });
+            historySelect.disabled = false;
+          } else { historySelect.disabled = true; }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const app = new PromptLibraryApp();
+      app.init();
+    });
+  </script>
+</body>
+</html>
