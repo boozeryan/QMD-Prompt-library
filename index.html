@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 維護版 (V6.0 - 雲端協作版)</title>
+  <title>品質處 Prompt Library – 維護版 (V6.1 - 雲端協作版)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -94,7 +94,7 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.0)</div>
+      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.1)</div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
 
@@ -107,14 +107,14 @@
                     <ul>
                         <li><b>即時同步：</b> 本版本已連接至雲端資料庫，任何使用者對提示詞的修改都會**即時同步**給所有正在使用此頁面的同事。</li>
                         <li><b>跨裝置存取：</b> 您可以在任何有權限存取此網址的電腦上，看到並編輯**同一個**、永遠最新的提示詞庫。</li>
-                        <li><b>資料安全：</b> 資料儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
+                        <li><b>資料更安全：</b> 資料儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
                     </ul>
                 </div>
                 <div class="note-column">
                     <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
                     <ul>
                         <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
-                        <li><b>舊資料不相容：</b> 您之前版本儲存在個人電腦的資料**不會**自動轉移，團隊將從一個全新的、共享的資料庫開始。</li>
+                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。</li>
                          <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據貼入此工具。</li>
                     </ul>
                 </div>
@@ -135,6 +135,8 @@
             <h2>功能操作</h2>
             <div class="content toolbar">
                 <div class="actions-controls">
+                    <button class="btn small ghost" id="importBtn">匯入資料</button>
+                    <button class="btn small ghost" id="exportBtn">匯出資料</button>
                     <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
                     <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
                 </div>
@@ -164,6 +166,8 @@
   <div id="toastContainer" class="toast-container"></div>
   <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr></template>
   
+  <input type="file" id="fileImporter" accept=".json" style="display: none;">
+
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -174,14 +178,14 @@
             tableBody: document.getElementById('prompt-list'), initialDataSource: document.getElementById('initial-data'),
             searchInput: document.getElementById('search'), clearSearchBtn: document.getElementById('clearSearchBtn'), categoryFilter: document.getElementById('categoryFilter'),
             categoryChipsContainer: document.getElementById('categoryChipsContainer'),
-            addNewBtn: document.getElementById('addNew'), manageCategoriesBtn: document.getElementById('manageCategoriesBtn'),
+            addNewBtn: document.getElementById('addNew'), manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), exportBtn: document.getElementById('exportBtn'), importBtn: document.getElementById('importBtn'), fileImporter: document.getElementById('fileImporter'),
             promptModal: { self: document.getElementById('promptModal'), title: document.getElementById('modalTitle'), form: document.getElementById('promptForm'), idInput: document.getElementById('promptId'), taskInput: document.getElementById('taskInput'), categoryInput: document.getElementById('categoryInput'), promptInput: document.getElementById('promptInput'), authorInput: document.getElementById('authorInput'), historySelect: document.getElementById('historySelect'), saveBtn: document.getElementById('saveBtn'), },
             categoryModal: { self: document.getElementById('categoryModal'), list: document.getElementById('categoryList'), form: document.getElementById('newCategoryForm'), input: document.getElementById('newCategoryInput'), closeBtn: document.getElementById('closeCategoryModalBtn'), },
             rowTemplate: document.getElementById('prompt-row-template'),
         };
         this.prompts = []; this.categories = []; this.isContentDirty = false;
         this.activeCategories = [];
-        this.db = null; // Firestore instance
+        this.db = null;
       }
 
       init() {
@@ -191,7 +195,6 @@
       }
 
       _initFirebase() {
-        // --- 雲端資料庫設定 ---
         const firebaseConfig = {
             apiKey: "AIzaSyDQDorsdx2Cetyp46riQC7i_xB2dMCvuYc",
             authDomain: "qmd-prompt-library.firebaseapp.com",
@@ -201,43 +204,30 @@
             appId: "1:622746077507:web:e5a1089f93dbf4dd5807f6",
             measurementId: "G-KHGRGT7W30"
         };
-        // --- 結束設定 ---
         try {
             firebase.initializeApp(firebaseConfig);
             this.db = firebase.firestore();
-        } catch (e) {
-            console.error("Firebase 初始化失敗:", e);
-            alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。");
-        }
+        } catch (e) { console.error("Firebase 初始化失敗:", e); alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。"); }
       }
 
       _setupRealtimeListeners() {
         if (!this.db) return;
-
-        // Listen for categories
         this.db.collection("categories").orderBy("name").onSnapshot(snapshot => {
             this.categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             this._populateCategoryDropdowns();
             this._renderCategoryChips();
             this._renderTable();
         });
-
-        // Listen for prompts
         this.db.collection("prompts").orderBy("createdDate", "desc").onSnapshot(snapshot => {
-            if (snapshot.empty) {
-                this._seedDataToFirestore();
-            } else {
-                this.prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                this._renderTable();
-            }
+            if (snapshot.empty) { this._seedDataToFirestore(); } 
+            else { this.prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); this._renderTable(); }
         });
       }
 
       async _seedDataToFirestore() {
         console.log("資料庫是空的，正在從 HTML 植入初始資料到雲端...");
         if (!this.db) return;
-        const rows = this.elements.initialDataSource.querySelectorAll('tr');
-        const categories = new Set();
+        const rows = this.elements.initialDataSource.querySelectorAll('tr'); const categories = new Set();
         const promptsToSeed = [];
 
         rows.forEach(row => {
@@ -253,23 +243,16 @@
         });
 
         const batch = this.db.batch();
-        // Add categories
         [...categories].sort().forEach(catName => {
             const catRef = this.db.collection("categories").doc();
             batch.set(catRef, { name: catName });
         });
-        // Add prompts
         promptsToSeed.forEach(prompt => {
             const promptRef = this.db.collection("prompts").doc();
             batch.set(promptRef, prompt);
         });
-
-        try {
-            await batch.commit();
-            this._showToast("已成功將預設提示詞庫上傳至雲端！");
-        } catch (e) {
-            console.error("植入初始資料失敗:", e);
-        }
+        try { await batch.commit(); this._showToast("已成功將預設提示詞庫上傳至雲端！"); } 
+        catch (e) { console.error("植入初始資料失敗:", e); }
       }
 
       _renderTable() {
@@ -294,7 +277,8 @@
             row.querySelector('.prompt .mono').innerHTML = prompt.prompt.replace(/\n/g, '<br>');
             row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
             row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
-            row.querySelector('.last-modified').textContent = `更新: ${new Date(prompt.lastModified.toDate()).toLocaleDateString()}`;
+            const lastModifiedDate = prompt.lastModified && prompt.lastModified.toDate ? prompt.lastModified.toDate() : new Date();
+            row.querySelector('.last-modified').textContent = `更新: ${lastModifiedDate.toLocaleDateString()}`;
             tableBody.appendChild(row);
         });
         this._updateActiveFilters();
@@ -304,11 +288,9 @@
         const { categoryFilter, promptModal } = this.elements;
         const { categoryInput } = promptModal;
         const currentFilterValue = categoryFilter.value;
-        
         categoryFilter.innerHTML = '<option value="all">全部分類</option>';
         this.categories.forEach(cat => { categoryFilter.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
         if(this.categories.some(c => c.name === currentFilterValue)) { categoryFilter.value = currentFilterValue; }
-
         const currentModalValue = categoryInput.value;
         categoryInput.innerHTML = '';
         this.categories.forEach(cat => { categoryInput.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
@@ -355,7 +337,7 @@
       _closeModal(modalElement) { modalElement.classList.remove('active'); }
 
       _bindEventListeners() {
-        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, categoryChipsContainer } = this.elements;
+        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, importBtn, fileImporter, categoryChipsContainer } = this.elements;
         const { self: promptModal, saveBtn } = this.elements.promptModal;
         const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
 
@@ -380,6 +362,9 @@
         });
         addNewBtn.addEventListener('click', () => this._openPromptModal('add'));
         manageCategoriesBtn.addEventListener('click', () => { this._renderCategoryList(); this._openModal(categoryModal); });
+        exportBtn.addEventListener('click', () => this._exportData());
+        importBtn.addEventListener('click', () => fileImporter.click());
+        fileImporter.addEventListener('change', e => this._handleFileImport(e));
         this.elements.tableBody.addEventListener('click', e => this._handleTableClick(e));
         promptModal.addEventListener('click', e => { if (e.target === promptModal || e.target.classList.contains('close-btn')) this._closePromptModal(); });
         this.elements.promptModal.form.addEventListener('input', () => { this.isContentDirty = true; });
@@ -460,12 +445,10 @@
               oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
               if (oldHistory.length > 10) oldHistory.pop();
               data.history = oldHistory;
-              this.db.collection("prompts").doc(id).update(data);
-              this._showToast('提示詞已更新！');
+              this.db.collection("prompts").doc(id).update(data).then(() => this._showToast('提示詞已更新！'));
           } else {
               data.createdDate = new Date(); data.copyCount = 0; data.history = [];
-              this.db.collection("prompts").add(data);
-              this._showToast('已成功新增提示詞！');
+              this.db.collection("prompts").add(data).then(() => this._showToast('已成功新增提示詞！'));
           }
           localStorage.setItem('promptLibraryAuthor', data.author);
           this.isContentDirty = false;
@@ -498,6 +481,87 @@
             }
             historySelect.value = '';
         }
+      }
+
+      _handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.prompts || !Array.isArray(data.prompts) || !data.categories || !Array.isArray(data.categories)) {
+                    throw new Error("Invalid file format");
+                }
+                if (confirm(`確定要從檔案中匯入 ${data.prompts.length} 條提示詞與 ${data.categories.length} 個分類嗎？\n此操作只會新增，不會刪除現有資料。`)) {
+                    await this._importDataToFirestore(data.prompts, data.categories);
+                }
+            } catch (err) {
+                this._showToast("檔案格式錯誤或解析失敗！", "error");
+                console.error(err);
+            } finally {
+                event.target.value = null; // Reset file input
+            }
+        };
+        reader.readAsText(file);
+      }
+
+      async _importDataToFirestore(prompts, categories) {
+        if (!this.db) return;
+        this._showToast("正在匯入資料...");
+        const batch = this.db.batch();
+        
+        // Import new categories
+        const existingCategoryNames = this.categories.map(c => c.name);
+        const newCategories = categories.filter(catName => !existingCategoryNames.includes(catName));
+        newCategories.forEach(catName => {
+            const catRef = this.db.collection("categories").doc();
+            batch.set(catRef, { name: catName });
+        });
+
+        // Import prompts
+        prompts.forEach(p => {
+            const promptRef = this.db.collection("prompts").doc();
+            batch.set(promptRef, {
+                task: p.task || "無標題",
+                category: p.category || "未分類",
+                prompt: p.prompt || "",
+                author: p.author || "Imported",
+                createdDate: new Date(),
+                lastModified: new Date(),
+                copyCount: 0,
+                history: []
+            });
+        });
+
+        try {
+            await batch.commit();
+            this._showToast(`成功匯入 ${prompts.length} 條提示詞與 ${newCategories.length} 個新分類！`);
+        } catch(err) {
+            this._showToast("匯入失敗，請稍後再試。", "error");
+            console.error("Import failed:", err);
+        }
+      }
+
+      _exportData() {
+        try {
+          const dataToExport = {
+            version: "prompt-library-v1.0",
+            exportedDate: new Date().toISOString(),
+            prompts: this.prompts.map(({id, ...rest}) => rest), // Export without IDs
+            categories: this.categories.map(c => c.name)
+          };
+          const jsonString = JSON.stringify(dataToExport, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const date = new Date().toISOString().split('T')[0];
+          a.href = url; a.download = `prompt_library_backup_${date}.json`;
+          document.body.appendChild(a); a.click();
+          document.body.removeChild(a); URL.revokeObjectURL(url);
+          this._showToast("資料已成功匯出！");
+        } catch(e) { console.error("匯出失敗:", e); this._showToast("匯出資料時發生錯誤。", "error"); }
       }
       
       _showToast(message, type = 'success') {
