@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 維護版 (V6.1 - 雲端協作版)</title>
+  <title>品質處 Prompt Library – 維護版 (V6.2 - 雲端協作版)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -24,7 +24,7 @@
     .muted{color:var(--muted);}
     .toolbar{display:flex; gap:10px; align-items:center; flex-wrap: wrap; justify-content: space-between;}
     .search-controls { display:flex; gap: 10px; flex-grow: 1; min-width: 300px;}
-    .actions-controls { display:flex; gap: 10px; }
+    .actions-controls { display:flex; gap: 10px; flex-wrap: wrap; }
     .search{position: relative; flex-grow: 1;}
     input[type="text"], textarea, select {
       width:100%; background:#0b1220; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:10px; outline:none; box-sizing: border-box;
@@ -89,12 +89,14 @@
     #categoryList li:nth-child(odd) { background: rgba(255,255,255,0.03); }
     #newCategoryForm { display: flex; gap: 10px; margin-top: 20px;}
     #newCategoryInput { flex: 1; }
+    #manualImportText { min-height: 200px; }
+    #manualImportLink { text-decoration: underline; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.1)</div>
+      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.2)</div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
 
@@ -114,8 +116,8 @@
                     <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
                     <ul>
                         <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
-                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。</li>
-                         <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據貼入此工具。</li>
+                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。若失敗可嘗試手動貼上。</li>
+                        <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據直接貼入此工具。</li>
                     </ul>
                 </div>
             </div>
@@ -140,6 +142,9 @@
                     <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
                     <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
                 </div>
+                <div id="importErrorContainer" style="width: 100%; text-align: right; display:none;">
+                    <a href="#" id="manualImportLink" class="small muted">匯入失敗？請點此嘗試手動貼上</a>
+                </div>
             </div>
         </section>
 
@@ -163,6 +168,7 @@
 
   <div class="modal-overlay" id="promptModal"><div class="modal-container"><div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn">&times;</button></div><div class="modal-content"><form id="promptForm"><input type="hidden" id="promptId"><div class="form-group"><label for="taskInput">任務目標</label><input type="text" id="taskInput" required></div><div class="form-group"><label for="categoryInput">分類</label><select id="categoryInput" required></select></div><div class="form-group"><label for="promptInput">Prompt 詞</label><textarea id="promptInput" rows="10" required></textarea></div><div class="form-group"><label for="authorInput">建立者 / 修改者</label><input type="text" id="authorInput" required></div><div class="modal-footer"><select id="historySelect" class="small history-select" disabled></select><button type="button" class="btn" id="saveBtn">儲存</button></div></form></div></div></div>
   <div class="modal-overlay" id="categoryModal"><div class="modal-container" style="max-width: 500px;"><div class="modal-header"><h3 id="categoryModalTitle">管理分類</h3><button class="close-btn">&times;</button></div><div class="modal-content"><ul id="categoryList"></ul><form id="newCategoryForm"><input type="text" id="newCategoryInput" placeholder="輸入新分類名稱..." required><button type="submit" class="btn btn-action small">新增</button></form></div><div class="modal-footer"><button class="btn ghost" id="closeCategoryModalBtn">完成</button></div></div></div>
+  <div class="modal-overlay" id="manualImportModal"><div class="modal-container"><div class="modal-header"><h3>手動匯入</h3><button class="close-btn">&times;</button></div><div class="modal-content"><p class="note">請將 .json 備份檔的內容完整複製並貼到下方文字框中。</p><textarea id="manualImportText"></textarea></div><div class="modal-footer"><button class="btn" id="importFromTextBtn">從文字匯入</button></div></div></div>
   <div id="toastContainer" class="toast-container"></div>
   <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr></template>
   
@@ -179,8 +185,10 @@
             searchInput: document.getElementById('search'), clearSearchBtn: document.getElementById('clearSearchBtn'), categoryFilter: document.getElementById('categoryFilter'),
             categoryChipsContainer: document.getElementById('categoryChipsContainer'),
             addNewBtn: document.getElementById('addNew'), manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), exportBtn: document.getElementById('exportBtn'), importBtn: document.getElementById('importBtn'), fileImporter: document.getElementById('fileImporter'),
+            importErrorContainer: document.getElementById('importErrorContainer'), manualImportLink: document.getElementById('manualImportLink'),
             promptModal: { self: document.getElementById('promptModal'), title: document.getElementById('modalTitle'), form: document.getElementById('promptForm'), idInput: document.getElementById('promptId'), taskInput: document.getElementById('taskInput'), categoryInput: document.getElementById('categoryInput'), promptInput: document.getElementById('promptInput'), authorInput: document.getElementById('authorInput'), historySelect: document.getElementById('historySelect'), saveBtn: document.getElementById('saveBtn'), },
             categoryModal: { self: document.getElementById('categoryModal'), list: document.getElementById('categoryList'), form: document.getElementById('newCategoryForm'), input: document.getElementById('newCategoryInput'), closeBtn: document.getElementById('closeCategoryModalBtn'), },
+            manualImportModal: { self: document.getElementById('manualImportModal'), textArea: document.getElementById('manualImportText'), importBtn: document.getElementById('importFromTextBtn') },
             rowTemplate: document.getElementById('prompt-row-template'),
         };
         this.prompts = []; this.categories = []; this.isContentDirty = false;
@@ -204,22 +212,18 @@
             appId: "1:622746077507:web:e5a1089f93dbf4dd5807f6",
             measurementId: "G-KHGRGT7W30"
         };
-        try {
-            firebase.initializeApp(firebaseConfig);
-            this.db = firebase.firestore();
-        } catch (e) { console.error("Firebase 初始化失敗:", e); alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。"); }
+        try { firebase.initializeApp(firebaseConfig); this.db = firebase.firestore(); } 
+        catch (e) { console.error("Firebase 初始化失敗:", e); alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。"); }
       }
 
       _setupRealtimeListeners() {
         if (!this.db) return;
         this.db.collection("categories").orderBy("name").onSnapshot(snapshot => {
             this.categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            this._populateCategoryDropdowns();
-            this._renderCategoryChips();
-            this._renderTable();
+            this._populateCategoryDropdowns(); this._renderCategoryChips(); this._renderTable();
         });
         this.db.collection("prompts").orderBy("createdDate", "desc").onSnapshot(snapshot => {
-            if (snapshot.empty) { this._seedDataToFirestore(); } 
+            if (snapshot.empty && this.categories.length === 0) { this._seedDataToFirestore(); } 
             else { this.prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); this._renderTable(); }
         });
       }
@@ -229,19 +233,15 @@
         if (!this.db) return;
         const rows = this.elements.initialDataSource.querySelectorAll('tr'); const categories = new Set();
         const promptsToSeed = [];
-
         rows.forEach(row => {
             const categoryText = row.querySelector('.cat').innerText.trim();
-            const taskCell = row.querySelector('.task');
-            const taskText = taskCell.childNodes[0].nodeValue.trim();
+            const taskCell = row.querySelector('.task'); const taskText = taskCell.childNodes[0].nodeValue.trim();
             categories.add(categoryText);
             promptsToSeed.push({
                 task: taskText, category: categoryText, prompt: row.querySelector('.prompt .mono').innerText.trim(),
-                author: 'System', createdDate: new Date(), lastModified: new Date(),
-                copyCount: 0, history: []
+                author: 'System', createdDate: new Date(), lastModified: new Date(), copyCount: 0, history: []
             });
         });
-
         const batch = this.db.batch();
         [...categories].sort().forEach(catName => {
             const catRef = this.db.collection("categories").doc();
@@ -267,13 +267,11 @@
 
         filtered.forEach((prompt, index) => {
             const row = this.elements.rowTemplate.content.cloneNode(true);
-            const tr = row.querySelector('.prompt-row');
-            tr.dataset.id = prompt.id;
+            const tr = row.querySelector('.prompt-row'); tr.dataset.id = prompt.id;
             row.querySelector('.id').textContent = index + 1;
             row.querySelector('.task').textContent = prompt.task;
             const categoryLabel = row.querySelector('.category-label');
-            categoryLabel.textContent = prompt.category;
-            categoryLabel.dataset.category = prompt.category;
+            categoryLabel.textContent = prompt.category; categoryLabel.dataset.category = prompt.category;
             row.querySelector('.prompt .mono').innerHTML = prompt.prompt.replace(/\n/g, '<br>');
             row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
             row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
@@ -318,11 +316,8 @@
               const isActive = (this.activeCategories.length === 0 && category === 'all') || this.activeCategories.includes(category);
               chip.classList.toggle('active', isActive);
           });
-          if (this.activeCategories.length === 1) {
-              categoryFilter.value = this.activeCategories[0];
-          } else {
-              categoryFilter.value = 'all';
-          }
+          if (this.activeCategories.length === 1) { categoryFilter.value = this.activeCategories[0]; } 
+          else { categoryFilter.value = 'all'; }
       }
 
       _renderCategoryList() {
@@ -337,9 +332,10 @@
       _closeModal(modalElement) { modalElement.classList.remove('active'); }
 
       _bindEventListeners() {
-        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, importBtn, fileImporter, categoryChipsContainer } = this.elements;
+        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, importBtn, fileImporter, categoryChipsContainer, manualImportLink } = this.elements;
         const { self: promptModal, saveBtn } = this.elements.promptModal;
         const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
+        const { self: manualImportModal, importBtn: importFromTextBtn } = this.elements.manualImportModal;
 
         searchInput.addEventListener('input', () => { this._toggleClearSearchBtn(); this._renderTable(); });
         clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); this._toggleClearSearchBtn(); this._renderTable(); });
@@ -365,6 +361,7 @@
         exportBtn.addEventListener('click', () => this._exportData());
         importBtn.addEventListener('click', () => fileImporter.click());
         fileImporter.addEventListener('change', e => this._handleFileImport(e));
+        manualImportLink.addEventListener('click', e => { e.preventDefault(); this._openModal(manualImportModal); });
         this.elements.tableBody.addEventListener('click', e => this._handleTableClick(e));
         promptModal.addEventListener('click', e => { if (e.target === promptModal || e.target.classList.contains('close-btn')) this._closePromptModal(); });
         this.elements.promptModal.form.addEventListener('input', () => { this.isContentDirty = true; });
@@ -373,7 +370,9 @@
         categoryModal.addEventListener('click', e => { if (e.target === categoryModal || e.target.classList.contains('close-btn') || e.target === closeCategoryModalBtn) this._closeModal(categoryModal); });
         categoryForm.addEventListener('submit', e => { e.preventDefault(); this._addNewCategory(); });
         categoryList.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') this._deleteCategory(e.target.dataset.id); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape' && promptModal.classList.contains('active')) this._closePromptModal(); });
+        manualImportModal.addEventListener('click', e => { if (e.target === manualImportModal || e.target.classList.contains('close-btn')) this._closeModal(manualImportModal); });
+        importFromTextBtn.addEventListener('click', () => this._handleManualImport());
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && (promptModal.classList.contains('active') || categoryModal.classList.contains('active') || manualImportModal.classList.contains('active'))) { this._closeModal(promptModal); this._closeModal(categoryModal); this._closeModal(manualImportModal); } });
         window.addEventListener('beforeunload', e => { if (this.isContentDirty) { e.preventDefault(); e.returnValue = ''; } });
       }
 
@@ -399,8 +398,7 @@
 
       _openPromptModal(mode = 'add', id = null) {
         const { title, idInput, taskInput, categoryInput, promptInput, authorInput, historySelect } = this.elements.promptModal;
-        this.isContentDirty = false;
-        idInput.value = ''; taskInput.value = ''; promptInput.value = ''; authorInput.value = '';
+        this.isContentDirty = false; idInput.value = ''; taskInput.value = ''; promptInput.value = ''; authorInput.value = '';
         categoryInput.value = '';
         
         if (mode === 'edit') {
@@ -430,29 +428,33 @@
         this._closeModal(this.elements.promptModal.self);
       }
 
-      _savePrompt() {
+      async _savePrompt() {
           const { form, idInput, taskInput, categoryInput, promptInput, authorInput } = this.elements.promptModal;
           if (!form.checkValidity()) { form.reportValidity(); this._showToast("儲存失敗：請檢查所有必填欄位！", "error"); return; }
           const id = idInput.value;
-          const data = {
-              task: taskInput.value.trim(), category: categoryInput.value, prompt: promptInput.value.trim(),
-              author: authorInput.value.trim(), lastModified: new Date()
-          };
+          const data = { task: taskInput.value.trim(), category: categoryInput.value, prompt: promptInput.value.trim(), author: authorInput.value.trim(), lastModified: new Date() };
 
-          if (id) {
-              const promptToUpdate = this.prompts.find(p => p.id === id);
-              const oldHistory = promptToUpdate.history || [];
-              oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
-              if (oldHistory.length > 10) oldHistory.pop();
-              data.history = oldHistory;
-              this.db.collection("prompts").doc(id).update(data).then(() => this._showToast('提示詞已更新！'));
-          } else {
-              data.createdDate = new Date(); data.copyCount = 0; data.history = [];
-              this.db.collection("prompts").add(data).then(() => this._showToast('已成功新增提示詞！'));
+          try {
+            if (id) {
+                const promptToUpdate = this.prompts.find(p => p.id === id);
+                const oldHistory = promptToUpdate.history || [];
+                oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
+                if (oldHistory.length > 10) oldHistory.pop();
+                data.history = oldHistory;
+                await this.db.collection("prompts").doc(id).update(data);
+                this._showToast('提示詞已更新！');
+            } else {
+                data.createdDate = new Date(); data.copyCount = 0; data.history = [];
+                await this.db.collection("prompts").add(data);
+                this._showToast('已成功新增提示詞！');
+            }
+            localStorage.setItem('promptLibraryAuthor', data.author);
+            this.isContentDirty = false;
+            this._closeModal(this.elements.promptModal.self);
+          } catch(e) {
+            console.error("儲存失敗: ", e);
+            this._showToast("儲存至雲端時發生錯誤。", "error");
           }
-          localStorage.setItem('promptLibraryAuthor', data.author);
-          this.isContentDirty = false;
-          this._closeModal(this.elements.promptModal.self);
       }
       
       _addNewCategory() {
@@ -486,25 +488,39 @@
       _handleFileImport(event) {
         const file = event.target.files[0];
         if (!file) return;
+        this.elements.importErrorContainer.style.display = 'none';
 
         const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (!data.prompts || !Array.isArray(data.prompts) || !data.categories || !Array.isArray(data.categories)) {
-                    throw new Error("Invalid file format");
-                }
-                if (confirm(`確定要從檔案中匯入 ${data.prompts.length} 條提示詞與 ${data.categories.length} 個分類嗎？\n此操作只會新增，不會刪除現有資料。`)) {
-                    await this._importDataToFirestore(data.prompts, data.categories);
-                }
-            } catch (err) {
-                this._showToast("檔案格式錯誤或解析失敗！", "error");
-                console.error(err);
-            } finally {
-                event.target.value = null; // Reset file input
-            }
+        reader.onload = (e) => this._processImportData(e.target.result);
+        reader.onerror = () => {
+            this._showToast("讀取檔案失敗！", "error");
+            this.elements.importErrorContainer.style.display = 'block';
         };
         reader.readAsText(file);
+        event.target.value = null;
+      }
+      
+      _handleManualImport(){
+        const { textArea, self } = this.elements.manualImportModal;
+        const content = textArea.value;
+        this._processImportData(content);
+        this._closeModal(self);
+      }
+
+      async _processImportData(jsonString){
+        try {
+            const data = JSON.parse(jsonString);
+            if (!data.prompts || !Array.isArray(data.prompts) || !data.categories || !Array.isArray(data.categories)) {
+                throw new Error("Invalid file format: missing prompts or categories array.");
+            }
+            if (confirm(`確定要從檔案中匯入 ${data.prompts.length} 條提示詞與 ${data.categories.length} 個分類嗎？\n此操作只會新增，不會刪除現有資料。`)) {
+                await this._importDataToFirestore(data.prompts, data.categories);
+            }
+        } catch (err) {
+            this._showToast("檔案格式錯誤或解析失敗！", "error");
+            this.elements.importErrorContainer.style.display = 'block';
+            console.error("Import processing error:", err);
+        }
       }
 
       async _importDataToFirestore(prompts, categories) {
@@ -512,7 +528,6 @@
         this._showToast("正在匯入資料...");
         const batch = this.db.batch();
         
-        // Import new categories
         const existingCategoryNames = this.categories.map(c => c.name);
         const newCategories = categories.filter(catName => !existingCategoryNames.includes(catName));
         newCategories.forEach(catName => {
@@ -520,18 +535,12 @@
             batch.set(catRef, { name: catName });
         });
 
-        // Import prompts
         prompts.forEach(p => {
             const promptRef = this.db.collection("prompts").doc();
             batch.set(promptRef, {
-                task: p.task || "無標題",
-                category: p.category || "未分類",
-                prompt: p.prompt || "",
-                author: p.author || "Imported",
-                createdDate: new Date(),
-                lastModified: new Date(),
-                copyCount: 0,
-                history: []
+                task: p.task || "無標題", category: p.category || "未分類", prompt: p.prompt || "",
+                author: p.author || "Imported", createdDate: new Date(), lastModified: new Date(),
+                copyCount: p.copyCount || 0, history: []
             });
         });
 
@@ -547,9 +556,8 @@
       _exportData() {
         try {
           const dataToExport = {
-            version: "prompt-library-v1.0",
-            exportedDate: new Date().toISOString(),
-            prompts: this.prompts.map(({id, ...rest}) => rest), // Export without IDs
+            version: "prompt-library-v1.0", exportedDate: new Date().toISOString(),
+            prompts: this.prompts.map(({id, ...rest}) => rest),
             categories: this.categories.map(c => c.name)
           };
           const jsonString = JSON.stringify(dataToExport, null, 2);
