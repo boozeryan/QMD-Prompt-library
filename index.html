@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 雲端協作版</title>
+  <title>品質處 Prompt Library – 維護版 (最終穩定版)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -104,10 +104,7 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="title">
-        <span>品質處 <span class="hl">Prompt Library</span></span>
-        <span class="version-tag">(V6.7)</span>
-      </div>
+      <div class="title">品質處 <span class="hl">Prompt Library</span></div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
 
@@ -202,7 +199,7 @@
                   <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">客退品數據初步分析<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">你是一位資深的可靠度工程師。我這裡有一批現場客退品的數據：{{請貼上去識別化的數據，例如：產品型號 A，總出貨量 10,000 台，1 年內客退 50 台，故障現象集中在開機無顯示 (35台) 和網路斷線 (15台)}}。請幫我分析這些數據：1) 計算初步的年化失效率 (AFR) 和 MTBF。2) 根據故障現象的帕累托分佈 (Pareto)，指出應優先分析的項目。3) 建議接下來的分析步驟。</div></td></tr>
                   <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">8D 報告內容優化<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">請幫我優化以下這段 8D 報告中的 D4 (根本原因分析) 內容。目標是使其語氣更專業、邏輯更清晰。請檢查是否有任何邏輯跳躍或證據不足之處，並提出改寫建議與理由。原文如下：{{貼上 D4 草稿內容}}</div></td></tr>
                   <tr data-cat="共用/管理"><td class="id"></td><td class="task">管理層報告摘要 (Executive Summary)<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請將以下這份 {{報告類型，例如 QBR 品質報告}} 的重點內容，濃縮成一份不超過 250 字的摘要，適合向高階主管匯報。摘要需包含：1) 整體品質表現 (KPIs)，2) 本季度的主要品質問題與改進成果，3) 面臨的挑戰與風險，4) 下一步的行動計畫。報告原文重點如下：{{貼上去識別化的報告重點段落}}</div></td></tr>
-                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內部訓練課程大綱規劃<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">我需要為新進的品質工程師設計一份關於「根本原因分析 (Root Cause Analysis)」的教育訓練。請幫我規劃一份 1 小時的課程大綱，包含：1) 學習目標，2) 各單元主題 (例如：什麼是 RCA、5 Whys 方法、魚骨圖)，3) 每個單元的時間分配，4) 互動練習或案例研討的建議。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內部訓練課程大綱規劃<br><span class="cat">共用/管理</span></td><td="prompt"><div class="mono">我需要為新進的品質工程師設計一份關於「根本原因分析 (Root Cause Analysis)」的教育訓練。請幫我規劃一份 1 小時的課程大綱，包含：1) 學習目標，2) 各單元主題 (例如：什麼是 RCA、5 Whys 方法、魚骨圖)，3) 每個單元的時間分配，4) 互動練習或案例研討的建議。</div></td></tr>
                 </tbody>
                 <tbody id="prompt-list"></tbody>
               </table>
