@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 維護版 (V6.6)</title>
+  <title>品質處 Prompt Library – 維護版 (V6.7)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -100,7 +100,7 @@
     <header>
       <div class="title">
         <span>品質處 <span class="hl">Prompt Library</span></span>
-        <span class="version-tag">(V6.6)</span>
+        <span class="version-tag">(V6.7)</span>
       </div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
@@ -110,31 +110,19 @@
             <h2>使用說明與注意事項</h2>
             <div class="content note note-columns">
                 <div class="note-column">
-                    <h4>基本操作</h4>
+                    <h4>雲端協作版說明</h4>
                     <ul>
-                        <li><b>搜尋與篩選：</b> 可使用<span class="mono">搜尋框</span>搜尋，點擊右側<span class="mono">×</span>可快速清除。或透過<span class="mono">下拉選單</span>與下方的<span class="mono">分類標籤</span>進行篩選。</li>
-                        <li><b>複選篩選：</b> 直接點擊<span class="mono">分類標籤</span>即可新增或移除篩選條件。點擊「全部分類」會取消所有篩選。</li>
-                        <li><b>新增/編輯：</b> 點擊<span class="mono">＋ 新增提示詞</span>按鈕來建立新指令。點擊每條提示詞右側的<span class="mono">編輯</span>按鈕進行修改。</li>
-                        <li><b>版本還原：</b> 在「編輯」視窗中，可從左下角的下拉選單**預覽**並**還原**歷史版本，是您大膽實驗和優化的最佳保障。</li>
-                    </ul>
-                    <h4>進階提示 (Pro-Tips)</h4>
-                    <ul>
-                        <li><b>善用變數：</b> 在您的提示詞中多使用 <span class="mono">{{變數}}</span> 格式（如 <span class="mono">{{產品型號}}</span>），這能大幅提升提示詞的重複使用性。</li>
-                        <li><b>結構化指令：</b> 一個高品質的提示詞通常包含四個核心要素：**角色** (e.g., 你是一位資深品保工程師)、**任務** (e.g., 撰寫 8D 報告草稿)、**限制** (e.g., 內容不超過 500 字)、和**輸出格式** (e.g., 使用 Markdown 表格)。</li>
+                        <li><b>即時同步：</b> 本版本已連接至雲端資料庫，任何使用者對提示詞的修改都會**即時同步**給所有正在使用此頁面的同事。</li>
+                        <li><b>跨裝置存取：</b> 您可以在任何有權限存取此網址的電腦上，看到並編輯**同一個**、永遠最新的提示詞庫。</li>
+                        <li><b>資料安全：</b> 核心資料庫儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
                     </ul>
                 </div>
                 <div class="note-column">
-                    <h4>資料管理</h4>
-                    <ul>
-                        <li><b>分類管理：</b> 點擊<span class="mono">管理分類</span>按鈕，可以新增或刪除**未被任何提示詞使用**的分類。</li>
-                        <li><b>匯出備份：</b> 點擊<span class="mono">匯出資料</span>可將雲端上整個詞庫打包下載。**未來版本計畫新增「匯入資料」功能。**</li>
-                    </ul>
                     <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
                     <ul>
-                        <li><b>雲端協作：</b> 本版本的所有核心資料（提示詞、分類等）都儲存在**雲端資料庫**，所有使用者的操作都會即時同步。</li>
-                        <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器並透過 `http` 網址訪問才能連上雲端。</li>
-                        <li><b>個人化設定儲存：</b> 您個人的「上次搜尋關鍵字」和「作者名稱」等非核心偏好設定，仍儲存在本機瀏覽器中。清除快取會重置它們，但<span class="hl-danger">不影響雲端主資料庫</span>。</li>
-                        <li><b>資訊安全：</b> 請遵守公司規範，<span class="hl-danger">切勿</span>將客戶機敏或公司機密數據貼入此工具。</li>
+                        <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
+                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。若失敗可嘗試手動貼上。</li>
+                        <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據直接貼入此工具。</li>
                     </ul>
                 </div>
             </div>
@@ -154,9 +142,13 @@
             <h2>功能操作</h2>
             <div class="content toolbar">
                 <div class="actions-controls">
+                    <button class="btn small ghost" id="importBtn">匯入資料</button>
                     <button class="btn small ghost" id="exportBtn">匯出資料</button>
                     <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
                     <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
+                </div>
+                <div id="importErrorContainer" style="width: 100%; text-align: right; display:none;">
+                    <a href="#" id="manualImportLink" class="small muted">匯入失敗？請點此嘗試手動貼上</a>
                 </div>
             </div>
         </section>
@@ -168,9 +160,44 @@
               <table id="lib">
                 <thead><tr><th style="width:5%">#</th><th style="width:30%">任務目標</th><th>Prompt 詞</th><th style="width:12%">操作</th></tr></thead>
                 <tbody id="initial-data" style="display: none;">
-                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規快速摘要＋行動清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">你是{{目標市場}}的{{適用法規}}專家。請以{{語言}}輸出：<br>1) 條款重點（條號＋要點，最多10條）；<br>2) 對{{產品型號}}在{{應用場景}}的影響；<br>3) 必要測試/文件清單（實驗室、報告、標示、聲明）；<br>4) 風險點與避免措施；<br>5) 接下來7天的行動計畫（負責人/輸出物/截止日）。<br>限制：引用條款標示版本與日期：{{標準版本與日期}}。</div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr>
-                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商變更（PCN）風險評估<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">針對供應商PCN：{{PCN編號/變更內容}}，請輸出風險評估：受影響料號/功能層級、配方/製程/尺寸變動分析、替代料相容性、需要の驗證計畫（測試項目/樣本量/時間表）、庫存與切換節點建議、跨部門RACI。</div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr>
-                  </tbody>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規快速摘要＋行動清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">你是{{目標市場}}的{{適用法規}}專家。請以{{語言}}輸出：<br>1) 條款重點（條號＋要點，最多10條）；<br>2) 對{{產品型號}}在{{應用場景}}的影響；<br>3) 必要測試/文件清單（實驗室、報告、標示、聲明）；<br>4) 風險點與避免措施；<br>5) 接下來7天的行動計畫（負責人/輸出物/截止日）。<br>限制：引用條款標示版本與日期：{{標準版本與日期}}。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規差距分析（GAP）<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">為{{產品型號}}針對{{法規/標準：如 IEC 62368-1, EN 55032, RED}}進行差距分析。輸出表格含：條款/要求、現況描述、缺口程度（H/M/L）、證據/文件、改進建議、責任單位、完成日。優先標出高風險缺口的短期替代方案。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">EMC/EMI 測試前預檢清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">基於{{產品型號}}之{{介面/端口/供電/外殼材料}}，請產出EMC預檢清單（傳導/輻射/ESD/Surge/EFT/CS/RS）。每項列：測試目的、條件/等級、重點風險位、佈線與治具注意、可預防的設計修正建議。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">RF 認證頻段/功率核對（多國）<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">針對{{無線技術：Wi‑Fi/BT/LTE/5G/LoRa}}與模組{{模組料號}}，請列出{{目標國家清單}}允許頻段/最大發射功率/管制備註，並輸出貼標與文件要求摘要。格式：表格＋重點備註（不超過8條）。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">防爆（ATEX/IECEx）文件清單產生<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">以{{使用區域/Zone}}、{{防爆型式}}、{{溫度等級}}、{{外殼等級}}條件，為{{產品型號}}產生ATEX/IECEx申請所需文件與測試清單，並標示由內部/外部供應之文件（RACI 表）。附上樣品準備與標示規格。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">有害物質（RoHS/REACH/SCIP）資料彙整<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">對{{BOM版本}}進行RoHS/REACH彙整：列出每顆{{關鍵零件}}の證明文件狀態（CoC/測試報告/宣告日期/到期），缺漏項請輸出對供應商の索件郵件模板（含截止日、需提供の格式、SCIP必要欄位）。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">能效/ErP/DOE 標示一致性檢查<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">針對{{產品型號}}の{{輸入電源/待機功耗/效率曲線}}，產生{{EU ErP / US DOE}}相關要求之標示/文件一致性清單，列出需於包裝/說明書/官網揭露之項目與缺漏風險。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商變更（PCN）風險評估<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">針對供應商PCN：{{PCN編號/變更內容}}，請輸出風險評估：受影響料號/功能層級、配方/製程/尺寸變動分析、替代料相容性、需要の驗證計畫（測試項目/樣本量/時間表）、庫存與切換節點建議、跨部門RACI。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">PPAP/FAI 文件審閱重點清單<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">為{{供應商/料號}}建立PPAP/FAI審閱清單：設計記錄、工程變更、DFMEA、PFMEA、控制計畫、量測系統（MSA/GRR）、初件檢驗結果、能力指標{{Cp/Cpk閾值}}、外觀/包裝樣本。輸出合格/缺失/待補文件列表。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">來料檢驗計畫與AQL建議<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">根據{{料號/年出貨量/品質歷史}}，請產出IQC抽樣方案：檢驗項目、檢驗方法/規格、AQL等級、抽樣數、接受/拒收數、加嚴/放寬條件，並生成檢驗紀錄表模板（表頭欄位）。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">圖面→檢驗特性展開<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">將下列圖面重點轉換為檢驗特性清單：{{圖面重點/公差/關鍵尺寸/表面處理}}。輸出：特性編號、規格/公差、量測方法/治具、頻率、記錄欄位、判定規則、關鍵/重大/一般分類。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFMEA 草案產生器<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">針對{{系統/模組/零件}}，依據功能樹與介面列出潛在失效模式：失效影響、失效原因、現行預防/偵測控制、S/O/D評分（給出評分理由）、RPN排序、優先改善建議與責任人/時程。附輸出CSV欄位。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">設計審查（DR）議程與問項包<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">為{{專案名稱/設計階段：DR0/DR1/DR2/PV}}產生設計審查議程與審查清單：需求/風險/界面/可製造性/可測試性/安規/EMC/熱/材料/韌體/DFX/量產風險。並列出需準備の證據與通過標準。</div></td></tr>
+                  <tr data-cat="設計品質/可靠度"><td class="id"></td><td class="task">可靠度驗證計畫（ALT/HALT/HASS）<br><span class="cat">設計品質/可靠度</span></td><td class="prompt"><div class="mono">基於{{環境條件/應力譜/使用情境}}，為{{產品型號}}產生可靠度驗證計畫：目標壽命/失效率、關鍵機制假設、加速模型（如Arrhenius/Peck等）選擇理由、測試矩陣、樣本量與停止準則、資料分析與判定規則、風險緩解動作。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">量產前 DFX 風險清單<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">依{{BOM/製程流程/夾治具/測試站/包裝}}，產出DFX（DFM/DFA/DFT/DFR/DFC）風險清單：風險描述、影響（成本/良率/風險等級）、偵測方法、改善方案、Owner與Due Date。請用表格輸出並標出Top 5。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">8D 報告快速成稿<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">根據客訴{{Ticket/客戶/機種/序號/症狀/不良率/時間線}}，產出8D草稿：D1團隊、D2問題定義（定義/界定/量化）、D3圍堵措施、D4根因（5 Why/Fishbone/證據）、D5糾正措施、D6有效性驗證、D7預防再發、D8表揚。附上KPI（重工成本/MTBF/退貨率）。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">根因分析（5-Why＋魚骨）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">針對{{缺陷現象/再現條件}}，請建立5 Whys與魚骨圖文本：人/機/料/法/環/測六大類。每一支線提供可驗證の證據與下一步實驗/樣本量。輸出最後關鍵因子清單與驗證計畫。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">CAPA 撰寫與驗收標準（SMART）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">請將下列改善建議轉為符合SMARTのCAPA條目：{{改善建議清單}}。每條含：具體描述、量化指標、責任人、資源、時間表、風險、驗收/審核方式、文件更新點（SOP/檢驗規範/治具校正）。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">客訴英文回覆（專業且友善）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">以{{品牌語氣/正式程度}}撰寫給{{客戶名稱}}の英文回覆：包含感謝、問題重述與同理、暫行圍堵措施、調查計畫（時程/里程碑）、需客戶協助の資訊、下一次更新時間點。語氣要專業、清楚、可行、尊重。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">RMA/故障樣品分析報告摘要→簡報<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">將以下RMA報告重點轉為簡報大綱：{{報告段落/數據圖}}。輸出：1頁執行摘要（關鍵數字/趨勢）、根因與證據、改善計畫與時間表、對客戶影響與承諾、附錄（數據/照片）。限制：每頁最多5個要點。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內外部稽核檢查表（ISO/客戶/安規）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">為{{稽核類型：ISO 9001/14001/客戶稽核/安規見證測試}}產生檢查表：條款/要求、證據文件、訪談對象、抽樣建議、常見缺失與避免技巧、是/否/不適用欄位。附開場與結案會議話術要點。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">專案Kickoff 議程＋RACI/里程碑<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">為{{專案名稱}}建立Kickoff大綱：目標/成功指標、里程碑與關鍵路徑、RACI、風險與緩解、溝通節奏（會議頻率/報告模板）、決策門檻與升級機制。輸出為1頁會議議程＋1頁責任矩陣表。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">SOP 撰寫助手（流程圖＋表單）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請依{{流程主題}}產出SOP草案：目的/範圍/名詞定義/角色職責/輸入輸出/步驟（含決策點）/表單樣式/紀錄保存/績效指標/風險與控制。最後輸出一份BPMN文字版流程圖節點清單。</div></td></tr>
+                  <tr data-cat="共用/管理/資料"><td class="id"></td><td class="task">資料表清理與欄位標準化（CSV）<br><span class="cat">共用/管理/資料</span></td><td class="prompt"><div class="mono">根據下列CSV欄位樣本，產生清理步驟：{{欄位與範例}}。包含：欄位重命名規範、單位統一、缺失值處理、規則檢核（如序號/日期/版本）、衝突合併策略、輸出欄位順序與資料字典。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">提示詞優化器（把需求→可執行Prompt）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請將以下需求轉為高品質Prompt：{{原始需求敘述}}。原則：1) 指定角色與產出格式；2) 列出輸入變數；3) 加入成功條件/限制；4) 要求逐步推理與核對清單；5) 加入驗收標準與範例。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">中英技術翻譯＋在地化術語<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">將以下技術內容於{{目標地區語言習慣：US/UK/EU/CN/TW}}在地化翻譯，保留數據與量詞不變。請輸出對照表：原文、譯文、專業術語說明、可能の誤譯風險與避免建議。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">新舊法規差異分析<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">作為一名經驗豐富的產品合規專家，請比較 {{新版法規，例如 EN 62368-1:2020}} 與 {{舊版法規，例如 EN 60950-1}} 的主要差異。請以表格形式呈現，欄位包含：「條款章節」、「舊版要求摘要」、「新版要求摘要」、以及「對我們 {{產品類型，例如交換式電源供應器}} 設計的潛在影響」。最後，總結出 3 個最高風險的改動點。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">測試計畫草案生成<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">我需要為產品 {{產品型號}} 建立一份針對 {{具體標準，例如 EN 55032 Class B}} 的電磁相容性 (EMC) 測試計畫草案。請基於此標準，列出所有必要的測試項目（例如：輻射騷擾、傳導騷擾），並為每個項目提供：1) 測試目的，2) 測試配置與頻率範圍，3) 合格的限值要求 (Limit)，4) 需要準備的樣品與輔助設備清單。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">符合性聲明 (DoC) 文件草擬<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">請幫我草擬一份適用於 {{目標市場，例如歐盟}} 的符合性聲明 (Declaration of Conformity) 文件模板。內容需包含：1) 產品資訊 (型號/名稱)，2) 製造商資訊，3) 聲明此產品符合的指令 (例如：EMC 指令 2014/30/EU, RoHS 指令 2011/65/EU)，4) 引用的一致性標準清單，5) 簽署資訊欄位。請使用專業且正式的 {{目標語言，例如英文}} 撰寫。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">零件承認測試計畫<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">我正在評估一顆新的 {{零件類型，例如 MOSFET}}，料號是 {{零件料號}}，預計用於 {{應用場景，例如高功率密度的伺服器電源}}。請為我產生一份零件承認測試計畫 (Component Qualification Plan)。計畫應包含：1) 電性參數驗證 (參考 Datasheet)，2) 可靠度測試 (例如：HTOL, TC)，3) 板階可靠度測試 (BLR)，4) 破壞性物理分析 (DPA) 檢查點。請建議每個測試項目的樣本數與允收標準。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商技術問題溝通郵件<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">請以專業的品保工程師語氣，草擬一封給供應商的英文郵件。事由：針對 {{零件料號}} 的 {{技術問題，例如 Datasheet 中關於 derating curve 的定義不明確}} 提出技術疑問。郵件內容需包含：1) 清晰描述我們遇到的問題，2) 附上我們目前的理解或測試數據，3) 提出具體的澄清請求 (例如：請提供在 85°C 環境溫度下的建議操作電流)。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFM (可製造性設計) 審查清單<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">針對一個 {{產品類型，例如工業電腦主機板}} 的 PCB Layout 設計，請生成一份製造性設計 (DFM) 的審查清單。清單需涵蓋以下方面：1) PCB 疊構與材料，2) 零件間距與佈局，3) 走線規則，4) 絲印與標示，5) Vias and Pads 設計，6) 可測試性設計 (DFT)。請將重點放在避免常見的生產問題。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFMEA 失效模式腦力激盪<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">我正在為 {{產品的一個模組，例如電池充電迴路}} 進行 DFMEA 分析。此迴路的主要功能是 {{功能描述，例如使用 BQ25700A 晶片為 4 串鋰電池充電}}。請幫我腦力激盪出至少 10 個潛在的失效模式 (Failure Modes)。對於每個失效模式，請推測其可能的失效影響 (Effects) 和潛在的失效原因 (Causes)。以表格形式呈現。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">客退品數據初步分析<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">你是一位資深的可靠度工程師。我這裡有一批現場客退品的數據：{{請貼上去識別化的數據，例如：產品型號 A，總出貨量 10,000 台，1 年內客退 50 台，故障現象集中在開機無顯示 (35台) 和網路斷線 (15台)}}。請幫我分析這些數據：1) 計算初步的年化失效率 (AFR) 和 MTBF。2) 根據故障現象的帕累托分佈 (Pareto)，指出應優先分析的項目。3) 建議接下來的分析步驟。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">8D 報告內容優化<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">請幫我優化以下這段 8D 報告中的 D4 (根本原因分析) 內容。目標是使其語氣更專業、邏輯更清晰。請檢查是否有任何邏輯跳躍或證據不足之處，並提出改寫建議與理由。原文如下：{{貼上 D4 草稿內容}}</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">管理層報告摘要 (Executive Summary)<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請將以下這份 {{報告類型，例如 QBR 品質報告}} 的重點內容，濃縮成一份不超過 250 字的摘要，適合向高階主管匯報。摘要需包含：1) 整體品質表現 (KPIs)，2) 本季度的主要品質問題與改進成果，3) 面臨的挑戰與風險，4) 下一步的行動計畫。報告原文重點如下：{{貼上去識別化的報告重點段落}}</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內部訓練課程大綱規劃<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">我需要為新進的品質工程師設計一份關於「根本原因分析 (Root Cause Analysis)」的教育訓練。請幫我規劃一份 1 小時的課程大綱，包含：1) 學習目標，2) 各單元主題 (例如：什麼是 RCA、5 Whys 方法、魚骨圖)，3) 每個單元的時間分配，4) 互動練習或案例研討的建議。</div></td></tr>
+                </tbody>
                 <tbody id="prompt-list"></tbody>
               </table>
             </div>
@@ -185,7 +212,6 @@
   <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button class="btn small ghost copy">複製</button><button class="btn small btn-action edit">編輯</button><button class="btn small btn-danger delete">刪除</button></td></tr></template>
   
   <script>
-    // This script requires the Firebase SDK to be loaded first in the HTML body.
     class PromptLibraryApp {
       constructor() {
         this.elements = {
@@ -199,11 +225,317 @@
         };
         this.prompts = []; this.categories = []; this.isContentDirty = false;
         this.activeCategories = [];
-        this.db = null;
       }
 
-      // ... (All JavaScript methods remain the same as the previous stable version) ...
-      // The content has been omitted here for brevity, but the full script is included in the final HTML file.
+      init() {
+        this._loadData(); this._populateCategoryDropdowns(); this._renderCategoryChips(); this._renderTable(); this._bindEventListeners();
+        const lastSearch = localStorage.getItem('promptLibrarySearch');
+        if (lastSearch) { this.elements.searchInput.value = lastSearch; this._toggleClearSearchBtn(); this._renderTable(); }
+      }
+
+      _loadData() {
+        try {
+          const promptsData = localStorage.getItem('promptLibraryPromptsV3');
+          const categoriesData = localStorage.getItem('promptLibraryCategoriesV3');
+          if (promptsData && categoriesData) {
+            this.prompts = JSON.parse(promptsData); this.categories = JSON.parse(categoriesData);
+            let wasMigrated = false;
+            this.prompts.forEach(p => { if (typeof p.id === 'number') { p.id = String(p.id); wasMigrated = true; } });
+            if (wasMigrated) { this._saveData(); this._showToast("資料格式已自動更新！"); }
+          } else { this._seedDataFromHTML(); }
+        } catch (e) { console.error("無法載入資料:", e); this._seedDataFromHTML(); }
+      }
+
+      _saveData() {
+        try { localStorage.setItem('promptLibraryPromptsV3', JSON.stringify(this.prompts)); localStorage.setItem('promptLibraryCategoriesV3', JSON.stringify(this.categories)); } 
+        catch (e) { console.error("無法儲存資料:", e); this._showToast("儲存失敗", "error"); }
+      }
+      
+      _seedDataFromHTML() {
+        const rows = this.elements.initialDataSource.querySelectorAll('tr'); const categories = new Set();
+        this.prompts = Array.from(rows).map(row => {
+          const categoryText = row.querySelector('.cat').innerText.trim();
+          const taskCell = row.querySelector('.task');
+          const taskText = taskCell.childNodes[0].nodeValue.trim();
+          categories.add(categoryText);
+          return { id: crypto.randomUUID(), task: taskText, category: categoryText, prompt: row.querySelector('.prompt .mono').innerText.trim(), author: 'System', createdDate: new Date().toISOString(), lastModified: new Date().toISOString(), copyCount: 0, history: [] };
+        });
+        this.categories = [...categories].sort(); this._saveData();
+        this._showToast("已成功載入預設提示詞庫！");
+      }
+
+      _renderTable() {
+        const { tableBody, searchInput } = this.elements; tableBody.innerHTML = '';
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const filtered = this.prompts.filter(p => {
+            const matchesCategory = this.activeCategories.length === 0 || this.activeCategories.includes(p.category);
+            const matchesSearch = !searchTerm || p.task.toLowerCase().includes(searchTerm) || p.prompt.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+        });
+        if (filtered.length === 0) { tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 32px;">找不到符合條件的提示詞。</td></tr>`; return; }
+
+        filtered.forEach((prompt, index) => {
+            const row = this.elements.rowTemplate.content.cloneNode(true);
+            const tr = row.querySelector('.prompt-row');
+            tr.dataset.id = prompt.id;
+            row.querySelector('.id').textContent = index + 1;
+            row.querySelector('.task').textContent = prompt.task;
+            const categoryLabel = row.querySelector('.category-label');
+            categoryLabel.textContent = prompt.category;
+            categoryLabel.dataset.category = prompt.category;
+            row.querySelector('.prompt .mono').innerHTML = prompt.prompt.replace(/\n/g, '<br>');
+            row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
+            row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
+            row.querySelector('.last-modified').textContent = `更新: ${new Date(prompt.lastModified).toLocaleDateString()}`;
+            tableBody.appendChild(row);
+        });
+        this._updateActiveFilters();
+      }
+      
+      _populateCategoryDropdowns() {
+        const { categoryFilter, promptModal } = this.elements;
+        [categoryFilter, promptModal.categoryInput].forEach(select => {
+            const currentValue = select.value; select.innerHTML = '';
+            if (select === categoryFilter) select.innerHTML += '<option value="all">全部分類</option>';
+            this.categories.forEach(cat => { select.innerHTML += `<option value="${cat}">${cat}</option>`; });
+            if (this.categories.includes(currentValue) || (select === categoryFilter && currentValue === 'all')) {
+                select.value = currentValue;
+            }
+        });
+      }
+
+      _renderCategoryChips() {
+          const { categoryChipsContainer } = this.elements;
+          categoryChipsContainer.innerHTML = '';
+          const allChip = document.createElement('span');
+          allChip.className = 'chip clickable';
+          allChip.textContent = '全部分類';
+          allChip.dataset.category = 'all';
+          categoryChipsContainer.appendChild(allChip);
+          this.categories.forEach(cat => {
+              const chip = document.createElement('span');
+              chip.className = 'chip clickable';
+              chip.textContent = cat;
+              chip.dataset.category = cat;
+              categoryChipsContainer.appendChild(chip);
+          });
+          this._updateActiveFilters();
+      }
+
+      _updateActiveFilters() {
+          const { categoryFilter, categoryChipsContainer } = this.elements;
+          categoryChipsContainer.querySelectorAll('.chip').forEach(chip => {
+              const category = chip.dataset.category;
+              const isAllChip = category === 'all';
+              const shouldBeActive = (isAllChip && this.activeCategories.length === 0) || (!isAllChip && this.activeCategories.includes(category));
+              chip.classList.toggle('active', shouldBeActive);
+          });
+          if (this.activeCategories.length === 1) {
+              categoryFilter.value = this.activeCategories[0];
+          } else {
+              categoryFilter.value = 'all';
+          }
+      }
+
+      _renderCategoryList() {
+        const { list } = this.elements.categoryModal; list.innerHTML = '';
+        this.categories.forEach(cat => {
+            const isUsed = this.prompts.some(p => p.category === cat);
+            list.innerHTML += `<li><span>${cat}</span><button class="btn small btn-danger" data-category="${cat}" ${isUsed ? 'disabled title="分類使用中，無法刪除"' : ''}>刪除</button></li>`;
+        });
+      }
+
+      _openModal(modalElement) { modalElement.classList.add('active'); }
+      _closeModal(modalElement) { modalElement.classList.remove('active'); }
+
+      _bindEventListeners() {
+        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, categoryChipsContainer } = this.elements;
+        const { self: promptModal, saveBtn } = this.elements.promptModal;
+        const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
+
+        searchInput.addEventListener('input', () => { this._toggleClearSearchBtn(); this._renderTable(); localStorage.setItem('promptLibrarySearch', searchInput.value); });
+        clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); this._toggleClearSearchBtn(); this._renderTable(); localStorage.setItem('promptLibrarySearch', ''); });
+        categoryFilter.addEventListener('change', (e) => {
+            this.activeCategories = e.target.value === 'all' ? [] : [e.target.value];
+            this._updateActiveFilters();
+            this._renderTable();
+        });
+        categoryChipsContainer.addEventListener('click', e => {
+            const target = e.target;
+            if (target.classList.contains('chip')) {
+                const category = target.dataset.category;
+                if (category === 'all') { this.activeCategories = []; } 
+                else {
+                    const index = this.activeCategories.indexOf(category);
+                    if (index > -1) { this.activeCategories.splice(index, 1); } 
+                    else { this.activeCategories.push(category); }
+                }
+                this._updateActiveFilters();
+                this._renderTable();
+            }
+        });
+
+        addNewBtn.addEventListener('click', () => this._openPromptModal('add'));
+        manageCategoriesBtn.addEventListener('click', () => { this._renderCategoryList(); this._openModal(categoryModal); });
+        exportBtn.addEventListener('click', () => this._exportData());
+        this.elements.tableBody.addEventListener('click', e => this._handleTableClick(e));
+        promptModal.addEventListener('click', e => { if (e.target === promptModal || e.target.classList.contains('close-btn')) this._closePromptModal(); });
+        this.elements.promptModal.form.addEventListener('input', () => { this.isContentDirty = true; });
+        saveBtn.addEventListener('click', () => this._savePrompt());
+        this.elements.promptModal.historySelect.addEventListener('change', (e) => this._restoreHistory(e));
+        categoryModal.addEventListener('click', e => { if (e.target === categoryModal || e.target.classList.contains('close-btn') || e.target === closeCategoryModalBtn) this._closeModal(categoryModal); });
+        categoryForm.addEventListener('submit', e => { e.preventDefault(); this._addNewCategory(); });
+        categoryList.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') this._deleteCategory(e.target.dataset.category); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && promptModal.classList.contains('active')) this._closePromptModal(); });
+        window.addEventListener('beforeunload', e => { if (this.isContentDirty) { e.preventDefault(); e.returnValue = ''; } });
+      }
+
+      _handleTableClick(e) {
+          const row = e.target.closest('.prompt-row');
+          if (!row) return;
+          const id = row.dataset.id;
+          if (e.target.closest('.copy')) {
+              const prompt = this.prompts.find(p => p.id === id);
+              if (prompt) navigator.clipboard.writeText(prompt.prompt).then(() => { prompt.copyCount++; this._saveData(); this._renderTable(); this._showToast('已成功複製到剪貼簿！'); });
+          } else if (e.target.closest('.edit')) {
+              this._openPromptModal('edit', id);
+          } else if (e.target.closest('.delete')) {
+              if (confirm('確定要刪除這條提示詞嗎？')) { this.prompts = this.prompts.filter(p => p.id !== id); this._saveData(); this._renderTable(); this._showToast('提示詞已刪除', 'error'); }
+          }
+      }
+
+      _openPromptModal(mode = 'add', id = null) {
+        const { title, idInput, taskInput, categoryInput, promptInput, authorInput, historySelect } = this.elements.promptModal;
+        this.isContentDirty = false;
+        idInput.value = ''; taskInput.value = ''; promptInput.value = ''; authorInput.value = '';
+        categoryInput.value = '';
+        
+        if (mode === 'edit') {
+          const prompt = this.prompts.find(p => p.id === id);
+          if (!prompt) { console.error("Prompt not found"); return; }
+          title.textContent = '編輯提示詞'; idInput.value = prompt.id; taskInput.value = prompt.task;
+          if (!this.categories.includes(prompt.category)) {
+              this._showToast(`注意：分類 "${prompt.category}" 已被刪除，請重新選擇。`, 'error');
+              const tempOption = document.createElement('option');
+              tempOption.value = prompt.category; tempOption.textContent = `${prompt.category} (已刪除)`;
+              categoryInput.appendChild(tempOption);
+          }
+          categoryInput.value = prompt.category; 
+          promptInput.value = prompt.prompt; authorInput.value = prompt.author || '';
+          this._populateHistory(prompt);
+        } else {
+          title.textContent = '新增提示詞';
+          if(this.categories.length > 0) { categoryInput.value = this.categories[0]; }
+          historySelect.innerHTML = '<option value="">無歷史版本</option>'; historySelect.disabled = true;
+          authorInput.value = localStorage.getItem('promptLibraryAuthor') || '';
+        }
+        this._openModal(this.elements.promptModal.self); taskInput.focus();
+      }
+
+      _closePromptModal() {
+        if (this.isContentDirty && !confirm('您有未儲存的變更，確定要關閉嗎？')) { return; }
+        this._closeModal(this.elements.promptModal.self);
+      }
+
+      _savePrompt() {
+          const { form, idInput, taskInput, categoryInput, promptInput, authorInput } = this.elements.promptModal;
+          if (!form.checkValidity()) {
+              form.reportValidity(); this._showToast("儲存失敗：請檢查所有必填欄位！", "error"); return;
+          }
+          const id = idInput.value;
+          if (id) {
+              const index = this.prompts.findIndex(p => p.id === id);
+              if (index > -1) {
+                  const promptToUpdate = this.prompts[index];
+                  const oldHistory = promptToUpdate.history || [];
+                  if (promptToUpdate.prompt !== promptInput.value.trim() || promptToUpdate.author !== authorInput.value.trim() || promptToUpdate.category !== categoryInput.value) {
+                    oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
+                    if (oldHistory.length > 10) oldHistory.pop();
+                  }
+                  
+                  promptToUpdate.task = taskInput.value.trim();
+                  promptToUpdate.category = categoryInput.value;
+                  promptToUpdate.prompt = promptInput.value.trim();
+                  promptToUpdate.author = authorInput.value.trim();
+                  promptToUpdate.lastModified = new Date().toISOString();
+                  promptToUpdate.history = oldHistory;
+                  
+                  this._showToast('提示詞已更新！');
+              } else {
+                  console.error('Save failed: Prompt with ID not found.', id); this._showToast('儲存失敗：找不到對應項目！', 'error'); return;
+              }
+          } else {
+              const newPrompt = { id: crypto.randomUUID(), task: taskInput.value.trim(), category: categoryInput.value, prompt: promptInput.value.trim(), author: authorInput.value.trim(), createdDate: new Date().toISOString(), lastModified: new Date().toISOString(), copyCount: 0, history: [] };
+              this.prompts.unshift(newPrompt);
+              this._showToast('已成功新增提示詞！');
+          }
+          this._saveData(); localStorage.setItem('promptLibraryAuthor', authorInput.value.trim());
+          this._renderTable(); this.isContentDirty = false;
+          this._closeModal(this.elements.promptModal.self);
+      }
+      
+      _addNewCategory() {
+          const { input } = this.elements.categoryModal; const newCat = input.value.trim();
+          if (newCat && !this.categories.includes(newCat)) {
+              this.categories.push(newCat); this.categories.sort(); this._saveData();
+              this._renderCategoryList(); this._populateCategoryDropdowns(); this._renderCategoryChips();
+              input.value = ''; this._showToast('已新增分類！');
+          } else { this._showToast(newCat ? '分類已存在' : '分類名稱不能為空', 'error'); }
+      }
+      
+      _deleteCategory(catToDelete) {
+          this.categories = this.categories.filter(c => c !== catToDelete); this._saveData();
+          this._renderCategoryList(); this._populateCategoryDropdowns(); this._renderCategoryChips();
+          this._showToast('分類已刪除', 'error');
+      }
+      
+      _restoreHistory(e) {
+        const { idInput, promptInput, historySelect } = this.elements.promptModal;
+        const id = idInput.value; const index = e.target.value;
+        if (id && index !== '') {
+            const prompt = this.prompts.find(p => p.id === id);
+            const historicVersion = prompt.history[index];
+            if (historicVersion && confirm('確定要還原到這個歷史版本嗎？')) {
+                promptInput.value = historicVersion.prompt; this._showToast('已還原歷史版本內容。');
+            }
+            historySelect.value = '';
+        }
+      }
+
+      _exportData() {
+        try {
+          const dataToExport = { version: "prompt-library-v1.0", exportedDate: new Date().toISOString(), prompts: this.prompts, categories: this.categories };
+          const jsonString = JSON.stringify(dataToExport, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const date = new Date().toISOString().split('T')[0];
+          a.href = url; a.download = `prompt_library_backup_${date}.json`;
+          document.body.appendChild(a); a.click();
+          document.body.removeChild(a); URL.revokeObjectURL(url);
+          this._showToast("資料已成功匯出！");
+        } catch(e) { console.error("匯出失敗:", e); this._showToast("匯出資料時發生錯誤。", "error"); }
+      }
+      
+      _showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`; toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3000);
+      }
+      
+      _toggleClearSearchBtn() { this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none'; }
+      
+      _populateHistory(prompt) {
+          const { historySelect } = this.elements.promptModal;
+          historySelect.innerHTML = '<option value="">檢視歷史版本...</option>';
+          if (prompt.history && prompt.history.length > 0) {
+            prompt.history.forEach((h, index) => { historySelect.innerHTML += `<option value="${index}">版本 #${prompt.history.length - index} (${new Date(h.modifiedDate).toLocaleString()})</option>`; });
+            historySelect.disabled = false;
+          } else { historySelect.disabled = true; }
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
