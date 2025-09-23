@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>品質處 Prompt Library – 維護版 (V6.5)</title>
   <style>
+    /* ===== 您需要新增的 CSS 樣式 ===== */
+    .hl-danger {
+      color: var(--btn-danger);
+      font-weight: 600;
+    }
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
     }
@@ -118,10 +123,14 @@
                 </div>
                 <div class="note-column">
                     <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
-                    <ul>
-                        <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
-                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。若失敗可嘗試手動貼上。</li>
-                        <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據直接貼入此工具。</li>
+                <ul>
+                    <li><b>資料儲存位置：</b> 您的所有資料都儲存在**您目前使用的這台電腦的瀏覽器中** (Local Storage)。</li>
+                    <li><b>無雲端同步：</b> 這代表資料**不會**在不同電腦或不同瀏覽器之間自動同步。</li>
+                    <li>⚠️ **資料遺失風險：** 清除瀏覽器快取或網站資料，將會**永久刪除**所有內容且**無法復原**。</li>
+                    <li><b>備份至關重要：</b> **請務必善用「匯出資料」功能，定期將您的資料庫備份成本地檔案**。</li>
+                    <li><b>簡易故障排除：</b> 若頁面出現異常，請先嘗試**重新整理 (F5)**。</li>
+                    <li><b>資訊安全：</b> 請遵守公司規範，**切勿**將客戶機敏或公司機密數據貼入此工具。</li>
+                </ul>
                     </ul>
                 </div>
             </div>
@@ -611,3 +620,4 @@
   </script>
 </body>
 </html>
+
