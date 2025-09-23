@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 維護版 (V6.2 - 雲端協作版)</title>
+  <title>品質處 Prompt Library – 維護版 (V6.3 - 雲端協作版)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -96,7 +96,7 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.2)</div>
+      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.3)</div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
 
@@ -489,7 +489,6 @@
         const file = event.target.files[0];
         if (!file) return;
         this.elements.importErrorContainer.style.display = 'none';
-
         const reader = new FileReader();
         reader.onload = (e) => this._processImportData(e.target.result);
         reader.onerror = () => {
@@ -503,12 +502,14 @@
       _handleManualImport(){
         const { textArea, self } = this.elements.manualImportModal;
         const content = textArea.value;
-        this._processImportData(content);
-        this._closeModal(self);
+        if(this._processImportData(content)){
+            this._closeModal(self);
+        }
       }
 
       async _processImportData(jsonString){
         try {
+            if(!jsonString) throw new Error("Input is empty.");
             const data = JSON.parse(jsonString);
             if (!data.prompts || !Array.isArray(data.prompts) || !data.categories || !Array.isArray(data.categories)) {
                 throw new Error("Invalid file format: missing prompts or categories array.");
@@ -516,10 +517,12 @@
             if (confirm(`確定要從檔案中匯入 ${data.prompts.length} 條提示詞與 ${data.categories.length} 個分類嗎？\n此操作只會新增，不會刪除現有資料。`)) {
                 await this._importDataToFirestore(data.prompts, data.categories);
             }
+            return true;
         } catch (err) {
             this._showToast("檔案格式錯誤或解析失敗！", "error");
             this.elements.importErrorContainer.style.display = 'block';
             console.error("Import processing error:", err);
+            return false;
         }
       }
 
