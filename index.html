@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 維護版 (V6.3 - 雲端協作版)</title>
+  <title>品質處 Prompt Library – 維護版 (V6.5)</title>
   <style>
     :root{
       --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
@@ -15,7 +15,8 @@
     }
     .wrap{max-width:1200px; margin:40px auto; padding:0 16px;}
     header{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;}
-    .title{font-size: clamp(22px, 3vw, 34px); font-weight:800; letter-spacing:.4px;}
+    .title{font-size: clamp(22px, 3vw, 34px); font-weight:800; letter-spacing:.4px; display: flex; align-items: baseline;}
+    .version-tag { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 10px; }
     .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted);}
     .grid{display:grid; gap:16px; grid-template-columns: 1fr;}
     .panel{border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,0.03);}
@@ -96,7 +97,10 @@
 <body>
   <div class="wrap">
     <header>
-      <div class="title">品質處 <span class="hl">Prompt Library</span> – 維護版 (V6.3)</div>
+      <div class="title">
+        <span>品質處 <span class="hl">Prompt Library</span></span>
+        <span class="version-tag">(V6.5)</span>
+      </div>
       <div class="badge">內部共享・標準化・可持續改進</div>
     </header>
 
@@ -553,6 +557,7 @@
         } catch(err) {
             this._showToast("匯入失敗，請稍後再試。", "error");
             console.error("Import failed:", err);
+            this.elements.importErrorContainer.style.display = 'block';
         }
       }
 
