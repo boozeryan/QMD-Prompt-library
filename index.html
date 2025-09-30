@@ -1,23 +1,95 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>品質處 Prompt Library – 雲端協作版 (最終穩定版)</title>
-  
-    <link rel="stylesheet" href="./style.css">
-
-  </head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>品質處 Prompt Library – 雲端協作版 (最終穩定版)</title>
+  
+  <link rel="stylesheet" href="./style.css">
+</head>
 <body>
-    <div class="wrap">
-    ...
-  </div>
-  ...
+  <div class="wrap">
+    <header>
+      <div class="title">品質處 <span class="hl">Prompt Library</span></div>
+      <div class="badge">內部共享・標準化・可持續改進</div>
+    </header>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  
-    <script src="./app.js" defer></script>
+    <div class="grid section">
+      <section class="panel">
+          <h2>使用說明與注意事項</h2>
+          <div class="content note note-columns">
+              <div class="note-column">
+                  <h4>雲端協作版說明</h4>
+                  <ul>
+                      <li><b>即時同步：</b> 本版本已連接至雲端資料庫，任何使用者對提示詞的修改都會**即時同步**給所有正在使用此頁面的同事。</li>
+                      <li><b>跨裝置存取：</b> 您可以在任何有權限存取此網址的電腦上，看到並編輯**同一個**、永遠最新的提示詞庫。</li>
+                      <li><b>資料安全：</b> 核心資料庫儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
+                  </ul>
+              </div>
+              <div class="note-column">
+                  <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
+                  <ul>
+                      <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
+                      <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。若失敗可嘗試手動貼上。</li>
+                      <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據直接貼入此工具。</li>
+                  </ul>
+              </div>
+          </div>
+      </section>
 
+      <section class="panel">
+          <h2>搜尋與篩選</h2>
+          <div class="content toolbar">
+              <div class="search-controls">
+                  <div class="search"><input id="search" type="text" placeholder="🔎 篩選關鍵字…" /><button id="clearSearchBtn" class="clear-search-btn" title="清除篩選">&times;</button></div>
+                  <select id="categoryFilter"><option value="all">全部分類</option></select>
+              </div>
+          </div>
+      </section>
+
+      <section class="panel">
+          <h2>功能操作</h2>
+          <div class="content toolbar">
+              <div class="actions-controls">
+                  <button class="btn small ghost" id="importBtn">匯入資料</button>
+                  <button class="btn small ghost" id="exportBtn">匯出資料</button>
+                  <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
+                  <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
+              </div>
+              <div id="importErrorContainer" style="width: 100%; text-align: right; display:none;">
+                  <a href="#" id="manualImportLink" class="small muted">匯入失敗？請點此嘗試手動貼上</a>
+              </div>
+          </div>
+      </section>
+
+      <section class="panel">
+          <h2>提示詞庫</h2>
+          <div class="content">
+            <div id="categoryChipsContainer" class="chips"></div>
+            <table id="lib">
+              <thead><tr><th style="width:5%">#</th><th style="width:30%">任務目標</th><th>Prompt 詞</th><th style="width:12%">操作</th></tr></thead>
+              <tbody id="initial-data" style="display: none;">
+                <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規快速摘要＋行動清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">你是{{目標市場}}的{{適用法規}}專家。請以{{語言}}輸出：<br>1) 條款重點（條號＋要點，最多10條）；<br>2) 對{{產品型號}}在{{應用場景}}的影響；<br>3) 必要測試/文件清單（實驗室、報告、標示、聲明）；<br>4) 風險點與避免措施；<br>5) 接下來7天的行動計畫（負責人/輸出物/截止日）。<br>限制：引用條款標示版本與日期：{{標準版本與日期}}。</div></td></tr>
+                <tr data-cat="共用/管理"><td class="id"></td><td class="task">內部訓練課程大綱規劃<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">我需要為新進的品質工程師設計一份關於「根本原因分析 (Root Cause Analysis)」的教育訓練。請幫我規劃一份 1 小時的課程大綱，包含：1) 學習目標，2) 各單元主題 (例如：什麼是 RCA、5 Whys 方法、魚骨圖)，3) 每個單元的時間分配，4) 互動練習或案例研討的建議。</div></td></tr>
+              </tbody>
+              <tbody id="prompt-list"></tbody>
+            </table>
+          </div>
+      </section>
+    </div>
+    <p class="footer">© 2025 品質處 Prompt Library – 雲端協作版</p>
+  </div>
+
+  <div class="modal-overlay" id="promptModal"><div class="modal-container"><div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn">&times;</button></div><div class="modal-content"><form id="promptForm"><input type="hidden" id="promptId"><div class="form-group"><label for="taskInput">任務目標</label><input type="text" id="taskInput" required></div><div class="form-group"><label for="categoryInput">分類</label><select id="categoryInput" required></select></div><div class="form-group"><label for="promptInput">Prompt 詞</label><textarea id="promptInput" rows="10" required></textarea></div><div id="historyPreviewContainer" style="display: none;"><label>歷史版本預覽 (唯讀)</label><textarea id="historyPreviewArea" readonly></textarea><div style="margin-top: 8px; display: flex; gap: 8px;"><button type="button" id="restoreBtn" class="btn small btn-action">還原此版本</button><button type="button" id="closePreviewBtn" class="btn small ghost">關閉預覽</button></div></div><div class="form-group" style="margin-top: 16px;"><label for="authorInput">建立者 / 修改者</label><input type="text" id="authorInput" required></div><div class="modal-footer"><select id="historySelect" class="small history-select" disabled></select><button type="button" class="btn" id="saveBtn">儲存</button></div></form></div></div></div>
+  <div class="modal-overlay" id="categoryModal"><div class="modal-container" style="max-width: 500px;"><div class="modal-header"><h3 id="categoryModalTitle">管理分類</h3><button class="close-btn">&times;</button></div><div class="modal-content"><ul id="categoryList"></ul><form id="newCategoryForm"><input type="text" id="newCategoryInput" placeholder="輸入新分類名稱..." required><button type="submit" class="btn btn-action small">新增</button></form></div><div class="modal-footer"><button class="btn ghost" id="closeCategoryModalBtn">完成</button></div></div></div>
+  <div class="modal-overlay" id="manualImportModal"><div class="modal-container"><div class="modal-header"><h3>手動匯入</h3><button class="close-btn">&times;</button></div><div class="modal-content"><p class="note">請將 .json 備份檔的內容完整複製並貼到下方文字框中。</p><textarea id="manualImportText"></textarea></div><div class="modal-footer"><button class="btn" id="importFromTextBtn">從文字匯入</button></div></div></div>
+  <div id="toastContainer" class="toast-container"></div>
+  <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button title="複製" class="icon-btn copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><button title="編輯" class="icon-btn edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button title="刪除" class="icon-btn delete"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td></tr></template>
+  <input type="file" id="fileImporter" accept=".json" style="display: none;">
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  
+  <script src="./app.js" defer></script>
 </body>
 </html>
