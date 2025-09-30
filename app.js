@@ -1,4 +1,4 @@
-// --- 正確且完整的 app.js 檔案內容 ---
+// --- 最終版 app.js ---
 
 class PromptLibraryApp {
   constructor() {
@@ -64,13 +64,15 @@ class PromptLibraryApp {
       apiKey: "AIzaSyDQDorsdx2Cetyp46riQC7i_xB2dMCvuYc",
       authDomain: "qmd-prompt-library.firebaseapp.com",
       projectId: "qmd-prompt-library",
-      storageBucket: "qmd-prompt-library.appspot.com", // 注意：這裡可能是 .appspot.com
+      storageBucket: "qmd-prompt-library.firebasestorage.app", // 已修正回您原始版本的值
       messagingSenderId: "622746077507",
       appId: "1:622746077507:web:e5a1089f93dbf4dd5807f6",
       measurementId: "G-KHGRGT7W30"
     };
     try {
-      firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
       this.db = firebase.firestore();
     } catch (e) {
       console.error("Firebase 初始化失敗:", e);
@@ -141,7 +143,7 @@ class PromptLibraryApp {
     const searchTerm = searchInput.value.trim().toLowerCase();
     const filtered = this.prompts.filter(p => {
       const matchesCategory = this.activeCategories.length === 0 || this.activeCategories.includes(p.category);
-      const matchesSearch = !searchTerm || p.task.toLowerCase().includes(searchTerm) || p.prompt.toLowerCase().includes(searchTerm);
+      const matchesSearch = !searchTerm || p.task.toLowerCase().includes(searchTerm) || p.prompt.toLowerCase().includes(searchTerm) || (p.author && p.author.toLowerCase().includes(searchTerm));
       return matchesCategory && matchesSearch;
     });
     if (filtered.length === 0) {
@@ -157,8 +159,8 @@ class PromptLibraryApp {
       const categoryLabel = row.querySelector('.category-label');
       categoryLabel.textContent = prompt.category;
       categoryLabel.dataset.category = prompt.category;
-      row.querySelector('.prompt .mono').textContent = prompt.prompt; // Use textContent for safety and correctness
-      row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
+      row.querySelector('.prompt .mono').textContent = prompt.prompt;
+      row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount || 0} 次`;
       row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
       const lastModifiedDate = prompt.lastModified && prompt.lastModified.toDate ? prompt.lastModified.toDate() : new Date();
       row.querySelector('.last-modified').textContent = `更新: ${lastModifiedDate.toLocaleDateString()}`;
@@ -238,10 +240,26 @@ class PromptLibraryApp {
   }
 
   _bindEventListeners() {
-    const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, importBtn, fileImporter, categoryChipsContainer, manualImportLink } = this.elements;
-    const { self: promptModal, saveBtn, historySelect, restoreBtn, closePreviewBtn } = this.elements.promptModal;
-    const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
-    const { self: manualImportModal, importBtn: importFromTextBtn } = this.elements.manualImportModal;
+    const {
+      searchInput, clearSearchBtn, categoryFilter, addNewBtn,
+      manageCategoriesBtn, exportBtn, importBtn, fileImporter,
+      categoryChipsContainer, manualImportLink
+    } = this.elements;
+
+    const {
+      self: promptModal, saveBtn, historySelect,
+      restoreBtn, closePreviewBtn
+    } = this.elements.promptModal;
+
+    const {
+      self: categoryModal, form: categoryForm, list: categoryList,
+      closeBtn: closeCategoryModalBtn
+    } = this.elements.categoryModal;
+
+    const {
+      self: manualImportModal, importBtn: importFromTextBtn
+    } = this.elements.manualImportModal;
+
     searchInput.addEventListener('input', () => {
       this._toggleClearSearchBtn();
       this._renderTable();
@@ -366,7 +384,7 @@ class PromptLibraryApp {
       idInput.value = prompt.id;
       taskInput.value = prompt.task;
       const categoryExists = this.categories.some(c => c.name === prompt.category);
-      if (!categoryExists) {
+      if (!categoryExists && prompt.category) {
         const tempOption = document.createElement('option');
         tempOption.value = prompt.category;
         tempOption.textContent = `${prompt.category} (已刪除)`;
@@ -485,10 +503,12 @@ class PromptLibraryApp {
     }
   }
 
+
+
   _closePreview() {
     const { historyPreviewContainer, historySelect } = this.elements.promptModal;
     historyPreviewContainer.style.display = 'none';
-    historySelect.value = '';
+    if(historySelect) historySelect.value = '';
   }
 
   _handleFileImport(event) {
@@ -510,6 +530,7 @@ class PromptLibraryApp {
     const content = textArea.value;
     if (this._processImportData(content)) {
       this._closeModal(self);
+      textArea.value = '';
     }
   }
 
@@ -552,7 +573,7 @@ class PromptLibraryApp {
         createdDate: new Date(),
         lastModified: new Date(),
         copyCount: p.copyCount || 0,
-        history: []
+        history: p.history || []
       });
     });
     try {
@@ -567,12 +588,33 @@ class PromptLibraryApp {
 
   _exportData() {
     try {
+      const sanitizedPrompts = this.prompts.map(p => {
+          const { id, ...rest } = p; // 移除 id
+          // 轉換 Firestore Timestamps 為 ISO 字串
+          if (rest.createdDate && rest.createdDate.toDate) {
+              rest.createdDate = rest.createdDate.toDate().toISOString();
+          }
+          if (rest.lastModified && rest.lastModified.toDate) {
+              rest.lastModified = rest.lastModified.toDate().toISOString();
+          }
+          if (rest.history && Array.isArray(rest.history)) {
+              rest.history = rest.history.map(h => {
+                  if (h.modifiedDate && h.modifiedDate.toDate) {
+                      h.modifiedDate = h.modifiedDate.toDate().toISOString();
+                  }
+                  return h;
+              });
+          }
+          return rest;
+      });
+
       const dataToExport = {
-        version: "prompt-library-v1.0",
+        version: "prompt-library-v2.0",
         exportedDate: new Date().toISOString(),
-        prompts: this.prompts.map(({ id, ...rest }) => rest),
+        prompts: sanitizedPrompts,
         categories: this.categories.map(c => c.name)
       };
+
       const jsonString = JSON.stringify(dataToExport, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -581,7 +623,7 @@ class PromptLibraryApp {
       a.href = url;
       a.download = `prompt_library_backup_${date}.json`;
       document.body.appendChild(a);
-a.click();
+      a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       this._showToast("資料已成功匯出！");
@@ -605,7 +647,9 @@ a.click();
   }
 
   _toggleClearSearchBtn() {
-    this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none';
+      if(this.elements.searchInput) {
+          this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none';
+      }
   }
 
   _populateHistory(prompt) {
@@ -613,8 +657,8 @@ a.click();
     historySelect.innerHTML = '<option value="">檢視歷史版本...</option>';
     if (prompt.history && prompt.history.length > 0) {
       prompt.history.forEach((h, index) => {
-        const date = h.modifiedDate.toDate ? h.modifiedDate.toDate() : new Date(h.modifiedDate);
-        historySelect.innerHTML += `<option value="${index}">版本 #${prompt.history.length - index} (${date.toLocaleString()})</option>`;
+        const date = h.modifiedDate && h.modifiedDate.toDate ? h.modifiedDate.toDate() : new Date(h.modifiedDate);
+        historySelect.innerHTML += `<option value="${index}">版本 #${prompt.history.length - index} (${date.toLocaleString('zh-TW')})</option>`;
       });
       historySelect.disabled = false;
     } else {
