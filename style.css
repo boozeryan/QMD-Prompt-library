@@ -101,4 +101,7 @@ body{
     #newCategoryInput { flex: 1; }
     #manualImportText { min-height: 200px; }
     #manualImportLink { text-decoration: underline; cursor: pointer; }
+tbody td.row-tools {
+  vertical-align: middle;
+}
   </style>
