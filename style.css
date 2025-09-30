@@ -259,12 +259,18 @@ tbody td {
     transition: max-height .3s;
 }
 
-/* --- 【【【【【 唯一的、真正的修正點在這裡 】】】】】 --- */
+/* --- 【【【【【 關鍵修正點 1 】】】】】 --- */
+/* 拿掉了衝突的 display:flex 和 gap，讓它回歸正常的表格欄位 */
 .row-tools {
-    display: flex;
-    gap: 2px;
-    align-items: flex-end; /* 使用 flexbox 的屬性來向下對齊 */
+    white-space: nowrap; /* 防止按鈕在視窗縮小時換行 */
 }
+
+/* --- 【【【【【 關鍵修正點 2 】】】】】 --- */
+/* 針對操作欄位，強制指定其垂直對齊方式為"底部" */
+tbody td.row-tools {
+    vertical-align: bottom;
+}
+
 
 .icon-btn {
     background: transparent;
@@ -273,9 +279,13 @@ tbody td {
     border-radius: 999px;
     cursor: pointer;
     transition: background-color .2s;
-    display: flex;
+    display: inline-flex; /* 改為 inline-flex 讓它能跟其他按鈕並排 */
     align-items: center;
     justify-content: center;
+    margin-left: 2px; /* 用 margin 取代 gap */
+}
+.icon-btn:first-child {
+    margin-left: 0;
 }
 
 .icon-btn svg {
