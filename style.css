@@ -557,7 +557,7 @@ tbody td {
     cursor: pointer;
 }
 
-/* --- 【【【【【 這就是修正對齊的關鍵程式碼 】】】】】 --- */
 tbody td.row-tools {
-    vertical-align: middle;
+    vertical-align: bottom;
 }
+
