@@ -259,9 +259,11 @@ tbody td {
     transition: max-height .3s;
 }
 
+/* --- 【【【【【 唯一的、真正的修正點在這裡 】】】】】 --- */
 .row-tools {
     display: flex;
     gap: 2px;
+    align-items: flex-end; /* 使用 flexbox 的屬性來向下對齊 */
 }
 
 .icon-btn {
@@ -556,8 +558,3 @@ tbody td {
     text-decoration: underline;
     cursor: pointer;
 }
-
-tbody td.row-tools {
-    vertical-align: bottom;
-}
-
