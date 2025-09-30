@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>品質處 Prompt Library – 雲端協作版 (最終穩定版)</title>
+  <style>
+    :root{
+      --bg:#021707; --panel:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#0ea5e9; --accent-2:#8b5cf6; --chip:#1f2937; --border:#334155; --btn-success:#22c55e; --btn-danger:#ef4444;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(160deg, var(--bg), #030712 60%); color:var(--text);
+    }
+    .wrap{max-width:1200px; margin:40px auto; padding:0 16px;}
+    header{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;}
+    .title{font-size: clamp(22px, 3vw, 34px); font-weight:800; letter-spacing:.4px; display: flex; align-items: baseline;}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,0.02); color:var(--muted);}
+    .grid{display:grid; gap:16px; grid-template-columns: 1fr;}
+    .panel{border:1px solid var(--border); border-radius:14px; background:rgba(255,255,255,0.03);}
+    .panel h2{margin:0; padding:16px 18px; font-size:18px; border-bottom:1px solid var(--border); background:rgba(255,255,255,0.03);}
+    .panel .content{padding:16px 18px; color:var(--text);}
+    .muted{color:var(--muted);}
+    .toolbar{display:flex; gap:10px; align-items:center; flex-wrap: wrap; justify-content: space-between;}
+    .search-controls { display:flex; gap: 10px; flex-grow: 1; min-width: 300px;}
+    .actions-controls { display:flex; gap: 10px; flex-wrap: wrap; }
+    .search{position: relative; flex-grow: 1;}
+    input[type="text"], textarea, select {
+      width:100%; background:#0b1220; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:10px; outline:none; box-sizing: border-box;
+    }
+    input[type="text"]{padding-right: 35px;}
+    .clear-search-btn {
+        position: absolute; right: 1px; top: 1px; bottom: 1px; background: none; border: none;
+        color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 10px; display: none;
+    }
+    .clear-search-btn:hover { color: var(--text); }
+    .btn{appearance:none; background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#00131a; font-weight:700; border:none; padding:10px 14px; border-radius:10px; cursor:pointer; transition:transform .05s ease, background .2s;}
+    .btn-action{background:var(--accent); color:white; padding:8px 12px;}
+    .btn-danger{background:var(--btn-danger); color:white; padding:8px 12px;}
+    .btn-success{background:var(--btn-success); color:white; padding:8px 12px;}
+    .btn:active{transform:scale(0.98);}
+    .btn-primary { padding: 10px 18px; }
+    table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px;}
+    thead th{position:sticky; top:0; background:#0b1220; text-align:left; padding:12px; font-size:13px; color:var(--muted); border-bottom:1px solid var(--border);}
+    tbody td{vertical-align:top; padding:14px 12px; border-bottom:1px dashed rgba(148,163,184,0.25);}
+    .prompt-row {background:rgba(255,255,255,0.02);}
+    .task{font-weight:700;}
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .chip{background:var(--chip); border:1px solid var(--border); padding:4px 8px; border-radius:999px; font-size:11px; color:var(--muted); display: inline-block;}
+    .chip.clickable { cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+    .chip.clickable:hover { background: var(--border); color: var(--text); }
+    .chip.active { background-color: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
+    .prompt{white-space:pre-wrap; max-height: 90px; overflow: hidden; transition: max-height .3s;}
+    .row-tools{display:flex; gap:2px;}
+    .icon-btn { background: transparent; border: none; padding: 6px; border-radius: 999px; cursor: pointer; transition: background-color .2s; display: flex; align-items: center; justify-content: center;}
+    .icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); transition: stroke .2s; }
+    .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+    .icon-btn:hover svg { stroke: var(--accent); }
+    .icon-btn.delete:hover svg { stroke: var(--btn-danger); }
+    .ghost{background:transparent; color:var(--muted); border:1px solid var(--border);}
+    .small{font-size:12px;}
+    .footer{color:var(--muted); font-size:12px; text-align:center; margin:24px 0 40px;}
+    .hl{color:var(--accent);}
+    .hl-danger { color: var(--btn-danger); font-weight: 600; }
+    .note{font-size:14px; line-height:1.8;}
+    .note-columns { display: flex; gap: 24px; }
+    .note-column { flex: 1; min-width: 0;}
+    @media (max-width: 768px) { .note-columns { flex-direction: column; } }
+    .note h4 { color: var(--accent); margin-top: 20px; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px;}
+    .note h4:first-child { margin-top: 0; }
+    .note ul { padding-left: 20px; margin: 0; }
+    .note li { margin-bottom: 12px; }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; font-size: 0.9em;}
+    .modal-overlay{position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; visibility:hidden; transition:opacity .3s, visibility .3s;}
+    .modal-overlay.active{opacity:1; visibility:visible;}
+    .modal-container{background:var(--panel); border:1px solid var(--border); border-radius:14px; width:90%; max-width:800px; max-height:90vh; display:flex; flex-direction:column; transform:scale(0.95); transition:transform .3s;}
+    .active .modal-container{transform:scale(1);}
+    .modal-header{padding:16px 24px; border-bottom:1px solid var(--border); font-size:18px; font-weight:700; display:flex; justify-content:space-between; align-items:center;}
+    .modal-header .close-btn{cursor:pointer; font-size:24px; color:var(--muted); background:none; border:none;}
+    .modal-content{padding:24px; overflow-y:auto; flex:1;}
+    .modal-footer{padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:12px; align-items:center;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block; margin-bottom:8px; font-size:14px; color:var(--muted);}
+    .history-select{width:auto; min-width:200px; margin-right: auto;}
+    #historyPreviewContainer { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border);}
+    #historyPreviewArea { min-height: 100px; background-color: rgba(0,0,0,0.2); opacity: 0.8; resize: none; }
+    .toast-container{position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:10px;}
+    .toast{padding:12px 20px; border-radius:8px; color:white; font-size:14px; opacity:0; transform:translateX(100%); transition:all .4s ease; box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+    .toast.show{opacity:1; transform:translateX(0);}
+    .toast.success{background-color:var(--btn-success);}
+    .toast.error{background-color:var(--btn-danger);}
+    .meta-container{display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px;}
+    .meta-item{font-size:11px; color:var(--muted);}
+    #categoryList { list-style: none; padding: 0; max-height: 40vh; overflow-y: auto;}
+    #categoryList li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
+    #categoryList li:nth-child(odd) { background: rgba(255,255,255,0.03); }
+    #newCategoryForm { display: flex; gap: 10px; margin-top: 20px;}
+    #newCategoryInput { flex: 1; }
+    #manualImportText { min-height: 200px; }
+    #manualImportLink { text-decoration: underline; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">品質處 <span class="hl">Prompt Library</span></div>
+      <div class="badge">內部共享・標準化・可持續改進</div>
+    </header>
+
+    <div class="grid section">
+        <section class="panel">
+            <h2>使用說明與注意事項</h2>
+            <div class="content note note-columns">
+                <div class="note-column">
+                    <h4>雲端協作版說明</h4>
+                    <ul>
+                        <li><b>即時同步：</b> 本版本已連接至雲端資料庫，任何使用者對提示詞的修改都會**即時同步**給所有正在使用此頁面的同事。</li>
+                        <li><b>跨裝置存取：</b> 您可以在任何有權限存取此網址的電腦上，看到並編輯**同一個**、永遠最新的提示詞庫。</li>
+                        <li><b>資料安全：</b> 核心資料庫儲存在雲端，不會因為個人電腦清理瀏覽器快取而遺失。</li>
+                    </ul>
+                </div>
+                <div class="note-column">
+                    <h4><span style="color: var(--btn-danger);">重要注意事項</span></h4>
+                    <ul>
+                        <li>⚠️ **必須透過網址存取：** 本工具**不能**再透過雙擊 HTML 檔案使用，必須部署到網頁伺服器（如公司內網）並透過 `http` 網址訪問。</li>
+                        <li><b>資料匯入：</b> 您可以使用「匯入資料」功能，將舊版備份的 `.json` 檔案合併到雲端資料庫中。若失敗可嘗試手動貼上。</li>
+                        <li><b>資訊安全：</b> 請遵守公司資訊安全規範，**切勿**將客戶機敏或公司機密數據直接貼入此工具。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>搜尋與篩選</h2>
+            <div class="content toolbar">
+                <div class="search-controls">
+                    <div class="search"><input id="search" type="text" placeholder="🔎 篩選關鍵字…" /><button id="clearSearchBtn" class="clear-search-btn" title="清除篩選">&times;</button></div>
+                    <select id="categoryFilter"><option value="all">全部分類</option></select>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>功能操作</h2>
+            <div class="content toolbar">
+                <div class="actions-controls">
+                    <button class="btn small ghost" id="importBtn">匯入資料</button>
+                    <button class="btn small ghost" id="exportBtn">匯出資料</button>
+                    <button class="btn small ghost" id="manageCategoriesBtn">管理分類</button>
+                    <button class="btn btn-primary" id="addNew">＋ 新增提示詞</button>
+                </div>
+                <div id="importErrorContainer" style="width: 100%; text-align: right; display:none;">
+                    <a href="#" id="manualImportLink" class="small muted">匯入失敗？請點此嘗試手動貼上</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>提示詞庫</h2>
+            <div class="content">
+              <div id="categoryChipsContainer" class="chips"></div>
+              <table id="lib">
+                <thead><tr><th style="width:5%">#</th><th style="width:30%">任務目標</th><th>Prompt 詞</th><th style="width:12%">操作</th></tr></thead>
+                <tbody id="initial-data" style="display: none;">
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規快速摘要＋行動清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">你是{{目標市場}}的{{適用法規}}專家。請以{{語言}}輸出：<br>1) 條款重點（條號＋要點，最多10條）；<br>2) 對{{產品型號}}在{{應用場景}}的影響；<br>3) 必要測試/文件清單（實驗室、報告、標示、聲明）；<br>4) 風險點與避免措施；<br>5) 接下來7天的行動計畫（負責人/輸出物/截止日）。<br>限制：引用條款標示版本與日期：{{標準版本與日期}}。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">法規差距分析（GAP）<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">為{{產品型號}}針對{{法規/標準：如 IEC 62368-1, EN 55032, RED}}進行差距分析。輸出表格含：條款/要求、現況描述、缺口程度（H/M/L）、證據/文件、改進建議、責任單位、完成日。優先標出高風險缺口的短期替代方案。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">EMC/EMI 測試前預檢清單<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">基於{{產品型號}}之{{介面/端口/供電/外殼材料}}，請產出EMC預檢清單（傳導/輻射/ESD/Surge/EFT/CS/RS）。每項列：測試目的、條件/等級、重點風險位、佈線與治具注意、可預防的設計修正建議。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">RF 認證頻段/功率核對（多國）<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">針對{{無線技術：Wi‑Fi/BT/LTE/5G/LoRa}}與模組{{模組料號}}，請列出{{目標國家清單}}允許頻段/最大發射功率/管制備註，並輸出貼標與文件要求摘要。格式：表格＋重點備註（不超過8條）。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">防爆（ATEX/IECEx）文件清單產生<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">以{{使用區域/Zone}}、{{防爆型式}}、{{溫度等級}}、{{外殼等級}}條件，為{{產品型號}}產生ATEX/IECEx申請所需文件與測試清單，並標示由內部/外部供應之文件（RACI 表）。附上樣品準備與標示規格。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">有害物質（RoHS/REACH/SCIP）資料彙整<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">對{{BOM版本}}進行RoHS/REACH彙整：列出每顆{{關鍵零件}}の證明文件狀態（CoC/測試報告/宣告日期/到期），缺漏項請輸出對供應商の索件郵件模板（含截止日、需提供の格式、SCIP必要欄位）。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">能效/ErP/DOE 標示一致性檢查<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">針對{{產品型號}}の{{輸入電源/待機功耗/效率曲線}}，產生{{EU ErP / US DOE}}相關要求之標示/文件一致性清單，列出需於包裝/說明書/官網揭露之項目與缺漏風險。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商變更（PCN）風險評估<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">針對供應商PCN：{{PCN編號/變更內容}}，請輸出風險評估：受影響料號/功能層級、配方/製程/尺寸變動分析、替代料相容性、需要の驗證計畫（測試項目/樣本量/時間表）、庫存與切換節點建議、跨部門RACI。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">PPAP/FAI 文件審閱重點清單<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">為{{供應商/料號}}建立PPAP/FAI審閱清單：設計記錄、工程變更、DFMEA、PFMEA、控制計畫、量測系統（MSA/GRR）、初件檢驗結果、能力指標{{Cp/Cpk閾值}}、外觀/包裝樣本。輸出合格/缺失/待補文件列表。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">來料檢驗計畫與AQL建議<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">根據{{料號/年出貨量/品質歷史}}，請產出IQC抽樣方案：檢驗項目、檢驗方法/規格、AQL等級、抽樣數、接受/拒收數、加嚴/放寬條件，並生成檢驗紀錄表模板（表頭欄位）。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">圖面→檢驗特性展開<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">將下列圖面重點轉換為檢驗特性清單：{{圖面重點/公差/關鍵尺寸/表面處理}}。輸出：特性編號、規格/公差、量測方法/治具、頻率、記錄欄位、判定規則、關鍵/重大/一般分類。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFMEA 草案產生器<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">針對{{系統/模組/零件}}，依據功能樹與介面列出潛在失效模式：失效影響、失效原因、現行預防/偵測控制、S/O/D評分（給出評分理由）、RPN排序、優先改善建議與責任人/時程。附輸出CSV欄位。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">設計審查（DR）議程與問項包<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">為{{專案名稱/設計階段：DR0/DR1/DR2/PV}}產生設計審查議程與審查清單：需求/風險/界面/可製造性/可測試性/安規/EMC/熱/材料/韌體/DFX/量產風險。並列出需準備の證據與通過標準。</div></td></tr>
+                  <tr data-cat="設計品質/可靠度"><td class="id"></td><td class="task">可靠度驗證計畫（ALT/HALT/HASS）<br><span class="cat">設計品質/可靠度</span></td><td class="prompt"><div class="mono">基於{{環境條件/應力譜/使用情境}}，為{{產品型號}}產生可靠度驗證計畫：目標壽命/失效率、關鍵機制假設、加速模型（如Arrhenius/Peck等）選擇理由、測試矩陣、樣本量與停止準則、資料分析與判定規則、風險緩解動作。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">量產前 DFX 風險清單<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">依{{BOM/製程流程/夾治具/測試站/包裝}}，產出DFX（DFM/DFA/DFT/DFR/DFC）風險清單：風險描述、影響（成本/良率/風險等級）、偵測方法、改善方案、Owner與Due Date。請用表格輸出並標出Top 5。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">8D 報告快速成稿<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">根據客訴{{Ticket/客戶/機種/序號/症狀/不良率/時間線}}，產出8D草稿：D1團隊、D2問題定義（定義/界定/量化）、D3圍堵措施、D4根因（5 Why/Fishbone/證據）、D5糾正措施、D6有效性驗證、D7預防再發、D8表揚。附上KPI（重工成本/MTBF/退貨率）。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">根因分析（5-Why＋魚骨）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">針對{{缺陷現象/再現條件}}，請建立5 Whys與魚骨圖文本：人/機/料/法/環/測六大類。每一支線提供可驗證の證據與下一步實驗/樣本量。輸出最後關鍵因子清單與驗證計畫。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">CAPA 撰寫與驗收標準（SMART）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">請將下列改善建議轉為符合SMARTのCAPA條目：{{改善建議清單}}。每條含：具體描述、量化指標、責任人、資源、時間表、風險、驗收/審核方式、文件更新點（SOP/檢驗規範/治具校正）。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">客訴英文回覆（專業且友善）<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">以{{品牌語氣/正式程度}}撰寫給{{客戶名稱}}の英文回覆：包含感謝、問題重述與同理、暫行圍堵措施、調查計畫（時程/里程碑）、需客戶協助の資訊、下一次更新時間點。語氣要專業、清楚、可行、尊重。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">RMA/故障樣品分析報告摘要→簡報<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">將以下RMA報告重點轉為簡報大綱：{{報告段落/數據圖}}。輸出：1頁執行摘要（關鍵數字/趨勢）、根因與證據、改善計畫與時間表、對客戶影響與承諾、附錄（數據/照片）。限制：每頁最多5個要點。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內外部稽核檢查表（ISO/客戶/安規）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">為{{稽核類型：ISO 9001/14001/客戶稽核/安規見證測試}}產生檢查表：條款/要求、證據文件、訪談對象、抽樣建議、常見缺失與避免技巧、是/否/不適用欄位。附開場與結案會議話術要點。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">專案Kickoff 議程＋RACI/里程碑<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">為{{專案名稱}}建立Kickoff大綱：目標/成功指標、里程碑與關鍵路徑、RACI、風險與緩解、溝通節奏（會議頻率/報告模板）、決策門檻與升級機制。輸出為1頁會議議程＋1頁責任矩陣表。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">SOP 撰寫助手（流程圖＋表單）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請依{{流程主題}}產出SOP草案：目的/範圍/名詞定義/角色職責/輸入輸出/步驟（含決策點）/表單樣式/紀錄保存/績效指標/風險與控制。最後輸出一份BPMN文字版流程圖節點清單。</div></td></tr>
+                  <tr data-cat="共用/管理/資料"><td class="id"></td><td class="task">資料表清理與欄位標準化（CSV）<br><span class="cat">共用/管理/資料</span></td><td class="prompt"><div class="mono">根據下列CSV欄位樣本，產生清理步驟：{{欄位與範例}}。包含：欄位重命名規範、單位統一、缺失值處理、規則檢核（如序號/日期/版本）、衝突合併策略、輸出欄位順序與資料字典。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">提示詞優化器（把需求→可執行Prompt）<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請將以下需求轉為高品質Prompt：{{原始需求敘述}}。原則：1) 指定角色與產出格式；2) 列出輸入變數；3) 加入成功條件/限制；4) 要求逐步推理與核對清單；5) 加入驗收標準與範例。</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">中英技術翻譯＋在地化術語<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">將以下技術內容於{{目標地區語言習慣：US/UK/EU/CN/TW}}在地化翻譯，保留數據與量詞不變。請輸出對照表：原文、譯文、專業術語說明、可能の誤譯風險與避免建議。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">新舊法規差異分析<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">作為一名經驗豐富的產品合規專家，請比較 {{新版法規，例如 EN 62368-1:2020}} 與 {{舊版法規，例如 EN 60950-1}} 的主要差異。請以表格形式呈現，欄位包含：「條款章節」、「舊版要求摘要」、「新版要求摘要」、以及「對我們 {{產品類型，例如交換式電源供應器}} 設計的潛在影響」。最後，總結出 3 個最高風險的改動點。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">測試計畫草案生成<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">我需要為產品 {{產品型號}} 建立一份針對 {{具體標準，例如 EN 55032 Class B}} 的電磁相容性 (EMC) 測試計畫草案。請基於此標準，列出所有必要的測試項目（例如：輻射騷擾、傳導騷擾），並為每個項目提供：1) 測試目的，2) 測試配置與頻率範圍，3) 合格的限值要求 (Limit)，4) 需要準備的樣品與輔助設備清單。</div></td></tr>
+                  <tr data-cat="產品認證/合規"><td class="id"></td><td class="task">符合性聲明 (DoC) 文件草擬<br><span class="cat">產品認證/合規</span></td><td class="prompt"><div class="mono">請幫我草擬一份適用於 {{目標市場，例如歐盟}} 的符合性聲明 (Declaration of Conformity) 文件模板。內容需包含：1) 產品資訊 (型號/名稱)，2) 製造商資訊，3) 聲明此產品符合的指令 (例如：EMC 指令 2014/30/EU, RoHS 指令 2011/65/EU)，4) 引用的一致性標準清單，5) 簽署資訊欄位。請使用專業且正式的 {{目標語言，例如英文}} 撰寫。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">零件承認測試計畫<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">我正在評估一顆新的 {{零件類型，例如 MOSFET}}，料號是 {{零件料號}}，預計用於 {{應用場景，例如高功率密度的伺服器電源}}。請為我產生一份零件承認測試計畫 (Component Qualification Plan)。計畫應包含：1) 電性參數驗證 (參考 Datasheet)，2) 可靠度測試 (例如：HTOL, TC)，3) 板階可靠度測試 (BLR)，4) 破壞性物理分析 (DPA) 檢查點。請建議每個測試項目的樣本數與允收標準。</div></td></tr>
+                  <tr data-cat="零件工程/承認"><td class="id"></td><td class="task">供應商技術問題溝通郵件<br><span class="cat">零件工程/承認</span></td><td class="prompt"><div class="mono">請以專業的品保工程師語氣，草擬一封給供應商的英文郵件。事由：針對 {{零件料號}} 的 {{技術問題，例如 Datasheet 中關於 derating curve 的定義不明確}} 提出技術疑問。郵件內容需包含：1) 清晰描述我們遇到的問題，2) 附上我們目前的理解或測試數據，3) 提出具體的澄清請求 (例如：請提供在 85°C 環境溫度下的建議操作電流)。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFM (可製造性設計) 審查清單<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">針對一個 {{產品類型，例如工業電腦主機板}} 的 PCB Layout 設計，請生成一份製造性設計 (DFM) 的審查清單。清單需涵蓋以下方面：1) PCB 疊構與材料，2) 零件間距與佈局，3) 走線規則，4) 絲印與標示，5) Vias and Pads 設計，6) 可測試性設計 (DFT)。請將重點放在避免常見的生產問題。</div></td></tr>
+                  <tr data-cat="設計品質"><td class="id"></td><td class="task">DFMEA 失效模式腦力激盪<br><span class="cat">設計品質</span></td><td class="prompt"><div class="mono">我正在為 {{產品的一個模組，例如電池充電迴路}} 進行 DFMEA 分析。此迴路的主要功能是 {{功能描述，例如使用 BQ25700A 晶片為 4 串鋰電池充電}}。請幫我腦力激盪出至少 10 個潛在的失效模式 (Failure Modes)。對於每個失效模式，請推測其可能的失效影響 (Effects) 和潛在的失效原因 (Causes)。以表格形式呈現。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">客退品數據初步分析<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">你是一位資深的可靠度工程師。我這裡有一批現場客退品的數據：{{請貼上去識別化的數據，例如：產品型號 A，總出貨量 10,000 台，1 年內客退 50 台，故障現象集中在開機無顯示 (35台) 和網路斷線 (15台)}}。請幫我分析這些數據：1) 計算初步的年化失效率 (AFR) 和 MTBF。2) 根據故障現象的帕累托分佈 (Pareto)，指出應優先分析的項目。3) 建議接下來的分析步驟。</div></td></tr>
+                  <tr data-cat="客戶品質/可靠度"><td class="id"></td><td class="task">8D 報告內容優化<br><span class="cat">客戶品質/可靠度</span></td><td class="prompt"><div class="mono">請幫我優化以下這段 8D 報告中的 D4 (根本原因分析) 內容。目標是使其語氣更專業、邏輯更清晰。請檢查是否有任何邏輯跳躍或證據不足之處，並提出改寫建議與理由。原文如下：{{貼上 D4 草稿內容}}</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">管理層報告摘要 (Executive Summary)<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">請將以下這份 {{報告類型，例如 QBR 品質報告}} 的重點內容，濃縮成一份不超過 250 字的摘要，適合向高階主管匯報。摘要需包含：1) 整體品質表現 (KPIs)，2) 本季度的主要品質問題與改進成果，3) 面臨的挑戰與風險，4) 下一步的行動計畫。報告原文重點如下：{{貼上去識別化的報告重點段落}}</div></td></tr>
+                  <tr data-cat="共用/管理"><td class="id"></td><td class="task">內部訓練課程大綱規劃<br><span class="cat">共用/管理</span></td><td class="prompt"><div class="mono">我需要為新進的品質工程師設計一份關於「根本原因分析 (Root Cause Analysis)」的教育訓練。請幫我規劃一份 1 小時的課程大綱，包含：1) 學習目標，2) 各單元主題 (例如：什麼是 RCA、5 Whys 方法、魚骨圖)，3) 每個單元的時間分配，4) 互動練習或案例研討的建議。</div></td></tr>
+                </tbody>
+                <tbody id="prompt-list"></tbody>
+              </table>
+            </div>
+        </section>
+        <p class="footer">© 2025 品質處 Prompt Library – 雲端協作版</p>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="promptModal"><div class="modal-container"><div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn">&times;</button></div><div class="modal-content"><form id="promptForm"><input type="hidden" id="promptId"><div class="form-group"><label for="taskInput">任務目標</label><input type="text" id="taskInput" required></div><div class="form-group"><label for="categoryInput">分類</label><select id="categoryInput" required></select></div><div class="form-group"><label for="promptInput">Prompt 詞</label><textarea id="promptInput" rows="10" required></textarea></div><div id="historyPreviewContainer" style="display: none;"><label>歷史版本預覽 (唯讀)</label><textarea id="historyPreviewArea" readonly></textarea><div style="margin-top: 8px; display: flex; gap: 8px;"><button type="button" id="restoreBtn" class="btn small btn-action">還原此版本</button><button type="button" id="closePreviewBtn" class="btn small ghost">關閉預覽</button></div></div><div class="form-group" style="margin-top: 16px;"><label for="authorInput">建立者 / 修改者</label><input type="text" id="authorInput" required></div><div class="modal-footer"><select id="historySelect" class="small history-select" disabled></select><button type="button" class="btn" id="saveBtn">儲存</button></div></form></div></div></div>
+  <div class="modal-overlay" id="categoryModal"><div class="modal-container" style="max-width: 500px;"><div class="modal-header"><h3 id="categoryModalTitle">管理分類</h3><button class="close-btn">&times;</button></div><div class="modal-content"><ul id="categoryList"></ul><form id="newCategoryForm"><input type="text" id="newCategoryInput" placeholder="輸入新分類名稱..." required><button type="submit" class="btn btn-action small">新增</button></form></div><div class="modal-footer"><button class="btn ghost" id="closeCategoryModalBtn">完成</button></div></div></div>
+  <div class="modal-overlay" id="manualImportModal"><div class="modal-container"><div class="modal-header"><h3>手動匯入</h3><button class="close-btn">&times;</button></div><div class="modal-content"><p class="note">請將 .json 備份檔的內容完整複製並貼到下方文字框中。</p><textarea id="manualImportText"></textarea></div><div class="modal-footer"><button class="btn" id="importFromTextBtn">從文字匯入</button></div></div></div>
+  <div id="toastContainer" class="toast-container"></div>
+  <template id="prompt-row-template"><tr class="prompt-row"><td class="id"></td><td><div class="task"></div><div class="meta-container"><span class="chip clickable category-label"></span><span class="meta-item copy-count"></span><span class="meta-item author"></span><span class="meta-item last-modified"></span></div></td><td class="prompt"><div class="mono"></div></td><td class="row-tools"><button title="複製" class="icon-btn copy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button><button title="編輯" class="icon-btn edit"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button><button title="刪除" class="icon-btn delete"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td></tr></template>
+  
+  <input type="file" id="fileImporter" accept=".json" style="display: none;">
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+  <script>
+    class PromptLibraryApp {
+      constructor() {
+        this.elements = {
+            tableBody: document.getElementById('prompt-list'), initialDataSource: document.getElementById('initial-data'),
+            searchInput: document.getElementById('search'), clearSearchBtn: document.getElementById('clearSearchBtn'), categoryFilter: document.getElementById('categoryFilter'),
+            categoryChipsContainer: document.getElementById('categoryChipsContainer'),
+            addNewBtn: document.getElementById('addNew'), manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), exportBtn: document.getElementById('exportBtn'), importBtn: document.getElementById('importBtn'), fileImporter: document.getElementById('fileImporter'),
+            importErrorContainer: document.getElementById('importErrorContainer'), manualImportLink: document.getElementById('manualImportLink'),
+            promptModal: { self: document.getElementById('promptModal'), title: document.getElementById('modalTitle'), form: document.getElementById('promptForm'), idInput: document.getElementById('promptId'), taskInput: document.getElementById('taskInput'), categoryInput: document.getElementById('categoryInput'), promptInput: document.getElementById('promptInput'), authorInput: document.getElementById('authorInput'), historySelect: document.getElementById('historySelect'), saveBtn: document.getElementById('saveBtn'), historyPreviewContainer: document.getElementById('historyPreviewContainer'), historyPreviewArea: document.getElementById('historyPreviewArea'), restoreBtn: document.getElementById('restoreBtn'), closePreviewBtn: document.getElementById('closePreviewBtn'), },
+            categoryModal: { self: document.getElementById('categoryModal'), list: document.getElementById('categoryList'), form: document.getElementById('newCategoryForm'), input: document.getElementById('newCategoryInput'), closeBtn: document.getElementById('closeCategoryModalBtn'), },
+            manualImportModal: { self: document.getElementById('manualImportModal'), textArea: document.getElementById('manualImportText'), importBtn: document.getElementById('importFromTextBtn') },
+            rowTemplate: document.getElementById('prompt-row-template'),
+        };
+        this.prompts = []; this.categories = []; this.isContentDirty = false;
+        this.activeCategories = [];
+        this.db = null;
+      }
+
+      init() {
+        this._initFirebase();
+        this._setupRealtimeListeners();
+        this._bindEventListeners();
+      }
+
+      _initFirebase() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQDorsdx2Cetyp46riQC7i_xB2dMCvuYc",
+            authDomain: "qmd-prompt-library.firebaseapp.com",
+            projectId: "qmd-prompt-library",
+            storageBucket: "qmd-prompt-library.firebasestorage.app",
+            messagingSenderId: "622746077507",
+            appId: "1:622746077507:web:e5a1089f93dbf4dd5807f6",
+            measurementId: "G-KHGRGT7W30"
+        };
+        try { firebase.initializeApp(firebaseConfig); this.db = firebase.firestore(); } 
+        catch (e) { console.error("Firebase 初始化失敗:", e); alert("雲端資料庫初始化失敗！請檢查您的 Firebase 設定。"); }
+      }
+
+      _setupRealtimeListeners() {
+        if (!this.db) return;
+        this.db.collection("categories").orderBy("name").onSnapshot(snapshot => {
+            this.categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            this._populateCategoryDropdowns(); this._renderCategoryChips(); this._renderTable();
+        });
+        this.db.collection("prompts").orderBy("createdDate", "desc").onSnapshot(snapshot => {
+            if (snapshot.empty && this.categories.length === 0) { this._seedDataToFirestore(); } 
+            else { this.prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); this._renderTable(); }
+        });
+      }
+
+      async _seedDataToFirestore() {
+        console.log("資料庫是空的，正在從 HTML 植入初始資料到雲端...");
+        if (!this.db) return;
+        const rows = this.elements.initialDataSource.querySelectorAll('tr'); const categories = new Set();
+        const promptsToSeed = [];
+        rows.forEach(row => {
+            const categoryText = row.querySelector('.cat').innerText.trim();
+            const taskCell = row.querySelector('.task'); const taskText = taskCell.childNodes[0].nodeValue.trim();
+            categories.add(categoryText);
+            promptsToSeed.push({
+                task: taskText, category: categoryText, prompt: row.querySelector('.prompt .mono').innerText.trim(),
+                author: 'System', createdDate: new Date(), lastModified: new Date(), copyCount: 0, history: []
+            });
+        });
+        const batch = this.db.batch();
+        [...categories].sort().forEach(catName => {
+            const catRef = this.db.collection("categories").doc();
+            batch.set(catRef, { name: catName });
+        });
+        promptsToSeed.forEach(prompt => {
+            const promptRef = this.db.collection("prompts").doc();
+            batch.set(promptRef, prompt);
+        });
+        try { await batch.commit(); this._showToast("已成功將預設提示詞庫上傳至雲端！"); } 
+        catch (e) { console.error("植入初始資料失敗:", e); }
+      }
+
+      _renderTable() {
+        const { tableBody, searchInput } = this.elements; tableBody.innerHTML = '';
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const filtered = this.prompts.filter(p => {
+            const matchesCategory = this.activeCategories.length === 0 || this.activeCategories.includes(p.category);
+            const matchesSearch = !searchTerm || p.task.toLowerCase().includes(searchTerm) || p.prompt.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+        });
+        if (filtered.length === 0) { tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 32px;">找不到符合條件的提示詞。</td></tr>`; return; }
+
+        filtered.forEach((prompt, index) => {
+            const row = this.elements.rowTemplate.content.cloneNode(true);
+            const tr = row.querySelector('.prompt-row'); tr.dataset.id = prompt.id;
+            row.querySelector('.id').textContent = index + 1;
+            row.querySelector('.task').textContent = prompt.task;
+            const categoryLabel = row.querySelector('.category-label');
+            categoryLabel.textContent = prompt.category; categoryLabel.dataset.category = prompt.category;
+            row.querySelector('.prompt .mono').innerHTML = prompt.prompt.replace(/\n/g, '<br>');
+            row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount} 次`;
+            row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
+            const lastModifiedDate = prompt.lastModified && prompt.lastModified.toDate ? prompt.lastModified.toDate() : new Date();
+            row.querySelector('.last-modified').textContent = `更新: ${lastModifiedDate.toLocaleDateString()}`;
+            tableBody.appendChild(row);
+        });
+        this._updateActiveFilters();
+      }
+      
+      _populateCategoryDropdowns() {
+        const { categoryFilter, promptModal } = this.elements;
+        const { categoryInput } = promptModal;
+        const currentFilterValue = categoryFilter.value;
+        categoryFilter.innerHTML = '<option value="all">全部分類</option>';
+        this.categories.forEach(cat => { categoryFilter.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
+        if(this.categories.some(c => c.name === currentFilterValue)) { categoryFilter.value = currentFilterValue; }
+        const currentModalValue = categoryInput.value;
+        categoryInput.innerHTML = '';
+        this.categories.forEach(cat => { categoryInput.innerHTML += `<option value="${cat.name}">${cat.name}</option>`; });
+        if(this.categories.some(c => c.name === currentModalValue)) { categoryInput.value = currentModalValue; }
+      }
+
+      _renderCategoryChips() {
+          const { categoryChipsContainer } = this.elements;
+          categoryChipsContainer.innerHTML = '';
+          const allChip = document.createElement('span');
+          allChip.className = 'chip clickable'; allChip.textContent = '全部分類'; allChip.dataset.category = 'all';
+          categoryChipsContainer.appendChild(allChip);
+          this.categories.forEach(cat => {
+              const chip = document.createElement('span');
+              chip.className = 'chip clickable'; chip.textContent = cat.name; chip.dataset.category = cat.name;
+              categoryChipsContainer.appendChild(chip);
+          });
+          this._updateActiveFilters();
+      }
+
+      _updateActiveFilters() {
+          const { categoryFilter, categoryChipsContainer } = this.elements;
+          categoryChipsContainer.querySelectorAll('.chip').forEach(chip => {
+              const category = chip.dataset.category;
+              const isActive = (this.activeCategories.length === 0 && category === 'all') || this.activeCategories.includes(category);
+              chip.classList.toggle('active', isActive);
+          });
+          if (this.activeCategories.length === 1) { categoryFilter.value = this.activeCategories[0]; } 
+          else { categoryFilter.value = 'all'; }
+      }
+
+      _renderCategoryList() {
+        const { list } = this.elements.categoryModal; list.innerHTML = '';
+        this.categories.forEach(cat => {
+            const isUsed = this.prompts.some(p => p.category === cat.name);
+            list.innerHTML += `<li><span>${cat.name}</span><button class="btn small btn-danger" data-id="${cat.id}" ${isUsed ? 'disabled title="分類使用中，無法刪除"' : ''}>刪除</button></li>`;
+        });
+      }
+
+      _openModal(modalElement) { modalElement.classList.add('active'); }
+      _closeModal(modalElement) { modalElement.classList.remove('active'); }
+
+      _bindEventListeners() {
+        const { searchInput, clearSearchBtn, categoryFilter, addNewBtn, manageCategoriesBtn, exportBtn, importBtn, fileImporter, categoryChipsContainer, manualImportLink } = this.elements;
+        const { self: promptModal, saveBtn, historySelect, restoreBtn, closePreviewBtn } = this.elements.promptModal;
+        const { self: categoryModal, form: categoryForm, list: categoryList, closeBtn: closeCategoryModalBtn } = this.elements.categoryModal;
+        const { self: manualImportModal, importBtn: importFromTextBtn } = this.elements.manualImportModal;
+
+        searchInput.addEventListener('input', () => { this._toggleClearSearchBtn(); this._renderTable(); });
+        clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); this._toggleClearSearchBtn(); this._renderTable(); });
+        categoryFilter.addEventListener('change', (e) => {
+            this.activeCategories = e.target.value === 'all' ? [] : [e.target.value];
+            this._updateActiveFilters(); this._renderTable();
+        });
+        categoryChipsContainer.addEventListener('click', e => {
+            const target = e.target;
+            if (target.classList.contains('chip')) {
+                const category = target.dataset.category;
+                if (category === 'all') { this.activeCategories = []; } 
+                else {
+                    const index = this.activeCategories.indexOf(category);
+                    if (index > -1) { this.activeCategories.splice(index, 1); } 
+                    else { this.activeCategories.push(category); }
+                }
+                this._updateActiveFilters(); this._renderTable();
+            }
+        });
+        addNewBtn.addEventListener('click', () => this._openPromptModal('add'));
+        manageCategoriesBtn.addEventListener('click', () => { this._renderCategoryList(); this._openModal(categoryModal); });
+        exportBtn.addEventListener('click', () => this._exportData());
+        importBtn.addEventListener('click', () => fileImporter.click());
+        fileImporter.addEventListener('change', e => this._handleFileImport(e));
+        manualImportLink.addEventListener('click', e => { e.preventDefault(); this._openModal(manualImportModal); });
+        this.elements.tableBody.addEventListener('click', e => this._handleTableClick(e));
+        promptModal.addEventListener('click', e => { if (e.target === promptModal || e.target.classList.contains('close-btn')) this._closePromptModal(); });
+        this.elements.promptModal.form.addEventListener('input', () => { this.isContentDirty = true; });
+        saveBtn.addEventListener('click', () => this._savePrompt());
+        historySelect.addEventListener('change', (e) => this._previewHistory(e));
+        restoreBtn.addEventListener('click', () => this._restoreFromPreview());
+        closePreviewBtn.addEventListener('click', () => this._closePreview());
+        categoryModal.addEventListener('click', e => { if (e.target === categoryModal || e.target.classList.contains('close-btn') || e.target === closeCategoryModalBtn) this._closeModal(categoryModal); });
+        categoryForm.addEventListener('submit', e => { e.preventDefault(); this._addNewCategory(); });
+        categoryList.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') this._deleteCategory(e.target.dataset.id); });
+        manualImportModal.addEventListener('click', e => { if (e.target === manualImportModal || e.target.classList.contains('close-btn')) this._closeModal(manualImportModal); });
+        importFromTextBtn.addEventListener('click', () => this._handleManualImport());
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && (promptModal.classList.contains('active') || categoryModal.classList.contains('active') || manualImportModal.classList.contains('active'))) { this._closeModal(promptModal); this._closeModal(categoryModal); this._closeModal(manualImportModal); } });
+        window.addEventListener('beforeunload', e => { if (this.isContentDirty) { e.preventDefault(); e.returnValue = ''; } });
+      }
+
+      _handleTableClick(e) {
+          const row = e.target.closest('.prompt-row'); if (!row) return;
+          const id = row.dataset.id;
+          if (e.target.closest('.copy')) {
+              const prompt = this.prompts.find(p => p.id === id);
+              if (prompt) {
+                  navigator.clipboard.writeText(prompt.prompt);
+                  this.db.collection("prompts").doc(id).update({ copyCount: firebase.firestore.FieldValue.increment(1) });
+                  this._showToast('已成功複製到剪貼簿！');
+              }
+          } else if (e.target.closest('.edit')) {
+              this._openPromptModal('edit', id);
+          } else if (e.target.closest('.delete')) {
+              if (confirm('確定要刪除這條提示詞嗎？')) {
+                  this.db.collection("prompts").doc(id).delete();
+                  this._showToast('提示詞已刪除', 'error');
+              }
+          }
+      }
+
+      _openPromptModal(mode = 'add', id = null) {
+        const { title, idInput, taskInput, categoryInput, promptInput, authorInput, historySelect } = this.elements.promptModal;
+        this.isContentDirty = false; idInput.value = ''; taskInput.value = ''; promptInput.value = ''; authorInput.value = '';
+        categoryInput.value = '';
+        this._closePreview();
+        
+        if (mode === 'edit') {
+          const prompt = this.prompts.find(p => p.id === id);
+          if (!prompt) return;
+          title.textContent = '編輯提示詞'; idInput.value = prompt.id; taskInput.value = prompt.task;
+          const categoryExists = this.categories.some(c => c.name === prompt.category);
+          if (!categoryExists) {
+              const tempOption = document.createElement('option');
+              tempOption.value = prompt.category; tempOption.textContent = `${prompt.category} (已刪除)`;
+              categoryInput.appendChild(tempOption);
+          }
+          categoryInput.value = prompt.category; 
+          promptInput.value = prompt.prompt; authorInput.value = prompt.author || '';
+          this._populateHistory(prompt);
+        } else {
+          title.textContent = '新增提示詞';
+          if(this.categories.length > 0) { categoryInput.value = this.categories[0].name; }
+          historySelect.innerHTML = '<option value="">無歷史版本</option>'; historySelect.disabled = true;
+          authorInput.value = localStorage.getItem('promptLibraryAuthor') || '';
+        }
+        this._openModal(this.elements.promptModal.self); taskInput.focus();
+      }
+
+      _closePromptModal() {
+        if (this.isContentDirty && !confirm('您有未儲存的變更，確定要關閉嗎？')) { return; }
+        this._closePreview();
+        this._closeModal(this.elements.promptModal.self);
+      }
+
+      async _savePrompt() {
+          const { form, idInput, taskInput, categoryInput, promptInput, authorInput } = this.elements.promptModal;
+          if (!form.checkValidity()) { form.reportValidity(); this._showToast("儲存失敗：請檢查所有必填欄位！", "error"); return; }
+          const id = idInput.value;
+          const data = { task: taskInput.value.trim(), category: categoryInput.value, prompt: promptInput.value.trim(), author: authorInput.value.trim(), lastModified: new Date() };
+
+          try {
+            if (id) {
+                const promptToUpdate = this.prompts.find(p => p.id === id);
+                const oldHistory = promptToUpdate.history || [];
+                oldHistory.unshift({ prompt: promptToUpdate.prompt, modifiedDate: promptToUpdate.lastModified, author: promptToUpdate.author });
+                if (oldHistory.length > 10) oldHistory.pop();
+                data.history = oldHistory;
+                await this.db.collection("prompts").doc(id).update(data);
+                this._showToast('提示詞已更新！');
+            } else {
+                data.createdDate = new Date(); data.copyCount = 0; data.history = [];
+                await this.db.collection("prompts").add(data);
+                this._showToast('已成功新增提示詞！');
+            }
+            localStorage.setItem('promptLibraryAuthor', data.author);
+            this.isContentDirty = false;
+            this._closeModal(this.elements.promptModal.self);
+          } catch(e) {
+            console.error("儲存失敗: ", e);
+            this._showToast("儲存至雲端時發生錯誤。", "error");
+          }
+      }
+      
+      _addNewCategory() {
+          const { input } = this.elements.categoryModal; const newCat = input.value.trim();
+          if (newCat && !this.categories.some(c => c.name === newCat)) {
+              this.db.collection("categories").add({ name: newCat });
+              input.value = ''; this._showToast('已新增分類！');
+          } else { this._showToast(newCat ? '分類已存在' : '分類名稱不能為空', 'error'); }
+      }
+      
+      _deleteCategory(id) {
+          if (confirm('確定要刪除這個分類嗎？')) {
+            this.db.collection("categories").doc(id).delete();
+            this._showToast('分類已刪除', 'error');
+          }
+      }
+      
+      _previewHistory(e) {
+        const { idInput, historyPreviewContainer, historyPreviewArea } = this.elements.promptModal;
+        const id = idInput.value; const index = e.target.value;
+        if (id && index !== '') {
+            const prompt = this.prompts.find(p => p.id === id);
+            const historicVersion = prompt.history[index];
+            if(historicVersion) {
+                historyPreviewArea.value = historicVersion.prompt;
+                historyPreviewContainer.style.display = 'block';
+            }
+        } else {
+            this._closePreview();
+        }
+      }
+
+      _restoreFromPreview(){
+        const { promptInput, historyPreviewArea } = this.elements.promptModal;
+        if(confirm('您確定要用預覽的內容覆蓋目前的編輯嗎？')){
+            promptInput.value = historyPreviewArea.value;
+            this._closePreview();
+            this._showToast('已還原版本內容至編輯器！');
+        }
+      }
+
+      _closePreview() {
+        const { historyPreviewContainer, historySelect } = this.elements.promptModal;
+        historyPreviewContainer.style.display = 'none';
+        historySelect.value = '';
+      }
+      
+      _handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        this.elements.importErrorContainer.style.display = 'none';
+        const reader = new FileReader();
+        reader.onload = (e) => this._processImportData(e.target.result);
+        reader.onerror = () => {
+            this._showToast("讀取檔案失敗！", "error");
+            this.elements.importErrorContainer.style.display = 'block';
+        };
+        reader.readAsText(file);
+        event.target.value = null;
+      }
+      
+      _handleManualImport(){
+        const { textArea, self } = this.elements.manualImportModal;
+        const content = textArea.value;
+        if(this._processImportData(content)){
+            this._closeModal(self);
+        }
+      }
+
+      async _processImportData(jsonString){
+        try {
+            if(!jsonString) throw new Error("Input is empty.");
+            const data = JSON.parse(jsonString);
+            if (!data.prompts || !Array.isArray(data.prompts) || !data.categories || !Array.isArray(data.categories)) {
+                throw new Error("Invalid file format: missing prompts or categories array.");
+            }
+            if (confirm(`確定要從檔案中匯入 ${data.prompts.length} 條提示詞與 ${data.categories.length} 個分類嗎？\n此操作只會新增，不會刪除現有資料。`)) {
+                await this._importDataToFirestore(data.prompts, data.categories);
+            }
+            return true;
+        } catch (err) {
+            this._showToast("檔案格式錯誤或解析失敗！", "error");
+            this.elements.importErrorContainer.style.display = 'block';
+            console.error("Import processing error:", err);
+            return false;
+        }
+      }
+
+      async _importDataToFirestore(prompts, categories) {
+        if (!this.db) return;
+        this._showToast("正在匯入資料...");
+        const batch = this.db.batch();
+        
+        const existingCategoryNames = this.categories.map(c => c.name);
+        const newCategories = categories.filter(catName => !existingCategoryNames.includes(catName));
+        newCategories.forEach(catName => {
+            const catRef = this.db.collection("categories").doc();
+            batch.set(catRef, { name: catName });
+        });
+
+        prompts.forEach(p => {
+            const promptRef = this.db.collection("prompts").doc();
+            batch.set(promptRef, {
+                task: p.task || "無標題", category: p.category || "未分類", prompt: p.prompt || "",
+                author: p.author || "Imported", createdDate: new Date(), lastModified: new Date(),
+                copyCount: p.copyCount || 0, history: []
+            });
+        });
+
+        try {
+            await batch.commit();
+            this._showToast(`成功匯入 ${prompts.length} 條提示詞與 ${newCategories.length} 個新分類！`);
+        } catch(err) {
+            this._showToast("匯入失敗，請稍後再試。", "error");
+            console.error("Import failed:", err);
+            this.elements.importErrorContainer.style.display = 'block';
+        }
+      }
+
+      _exportData() {
+        try {
+          const dataToExport = {
+            version: "prompt-library-v1.0", exportedDate: new Date().toISOString(),
+            prompts: this.prompts.map(({id, ...rest}) => rest),
+            categories: this.categories.map(c => c.name)
+          };
+          const jsonString = JSON.stringify(dataToExport, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const date = new Date().toISOString().split('T')[0];
+          a.href = url; a.download = `prompt_library_backup_${date}.json`;
+          document.body.appendChild(a); a.click();
+          document.body.removeChild(a); URL.revokeObjectURL(url);
+          this._showToast("資料已成功匯出！");
+        } catch(e) { console.error("匯出失敗:", e); this._showToast("匯出資料時發生錯誤。", "error"); }
+      }
+      
+      _showToast(message, type = 'success') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`; toast.textContent = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3000);
+      }
+      
+      _toggleClearSearchBtn() { this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none'; }
+      
+      _populateHistory(prompt) {
+          const { historySelect } = this.elements.promptModal;
+          historySelect.innerHTML = '<option value="">檢視歷史版本...</option>';
+          if (prompt.history && prompt.history.length > 0) {
+            prompt.history.forEach((h, index) => { 
+                const date = h.modifiedDate.toDate ? h.modifiedDate.toDate() : new Date(h.modifiedDate);
+                historySelect.innerHTML += `<option value="${index}">版本 #${prompt.history.length - index} (${date.toLocaleString()})</option>`;
+            });
+            historySelect.disabled = false;
+          } else { historySelect.disabled = true; }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const app = new PromptLibraryApp();
+      app.init();
+    });
+  </script>
+</body>
+</html>
