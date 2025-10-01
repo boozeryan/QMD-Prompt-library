@@ -1,7 +1,24 @@
-// --- 最終版 app.js ---
+/**
+ * @file app.js
+ * @description 品質處 Prompt Library 雲端協作版的核心應用程式邏輯。
+ * @version 2.1 - 兩欄式佈局與提示詞高亮
+ * @date 2025-10-01
+ */
 
+/**
+ * @class PromptLibraryApp
+ * @description 整個提示詞庫應用程式的主要類別。
+ * 它封裝了所有與 UI 互動、資料處理、以及與 Firebase 後端通訊的功能。
+ */
 class PromptLibraryApp {
+  /**
+   * @constructor
+   * @description 初始化應用程式。主要工作是快取所有會用到的 DOM 元素以便快速存取，
+   * 並設定應用程式的初始狀態變數。
+   */
   constructor() {
+    // --- DOM 元素快取 ---
+    // 預先選取所有 HTML 元素並存放在 this.elements 物件中，可避免重複查詢 DOM，提升效能。
     this.elements = {
       tableBody: document.getElementById('prompt-list'),
       initialDataSource: document.getElementById('initial-data'),
@@ -21,20 +38,34 @@ class PromptLibraryApp {
       manualImportModal: { self: document.getElementById('manualImportModal'), textArea: document.getElementById('manualImportText'), importBtn: document.getElementById('importFromTextBtn') },
       rowTemplate: document.getElementById('prompt-row-template'),
     };
-    this.prompts = [];
-    this.categories = [];
-    this.isContentDirty = false;
-    this.activeCategories = [];
-    this.db = null;
+
+    // --- 應用程式狀態變數 ---
+    this.prompts = []; // 存放從 Firestore 讀取的所有提示詞資料
+    this.categories = []; // 存放所有分類資料
+    this.isContentDirty = false; // 標記彈出視窗內的表單是否有未儲存的變更
+    this.activeCategories = []; // 存放目前被使用者選取用於篩選的分類
+    this.db = null; // 用於存放 Firebase Firestore 的實例
   }
 
+  /**
+   * @method init
+   * @description 應用程式的公開進入點。
+   * 負責依序呼叫各個初始化函式，啟動整個應用程式。
+   */
   init() {
     this._initFirebase();
     this._setupRealtimeListeners();
     this._bindEventListeners();
   }
 
+  /**
+   * @private
+   * @method _initFirebase
+   * @description 初始化 Firebase 應用和 Firestore 資料庫連線。
+   * 如果初始化失敗，會向使用者顯示警告。
+   */
   _initFirebase() {
+    // 【重要】請將此處替換為您自己的 Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyDQDorsdx2Cetyp46riQC7i_xB2dMCvuYc",
       authDomain: "qmd-prompt-library.firebaseapp.com",
@@ -55,6 +86,14 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _setupRealtimeListeners
+   * @description 設定 Firestore 的即時監聽器。
+   * 當雲端資料庫中的 'categories' 或 'prompts' 集合發生任何變動時，
+   * 會自動獲取最新資料並觸發 UI 重新渲染，達到即時同步的效果。
+   * 同時也負責處理初次使用時的資料庫 seeding。
+   */
   _setupRealtimeListeners() {
     if (!this.db) return;
     this.db.collection("categories").orderBy("name").onSnapshot(snapshot => {
@@ -73,8 +112,14 @@ class PromptLibraryApp {
     });
   }
 
+  /**
+   * @private
+   * @method _seedDataToFirestore
+   * @description 植入初始資料。此函式僅在雲端資料庫完全為空時被觸發一次。
+   * 它會從 HTML 中隱藏的表格讀取預設資料，並使用批次寫入 (batch write)
+   * 的方式將其高效地上傳到 Firestore。
+   */
   async _seedDataToFirestore() {
-    // ... 此函式內容不變 ...
     console.log("資料庫是空的，正在從 HTML 植入初始資料到雲端...");
     if (!this.db) return;
     const rows = this.elements.initialDataSource.querySelectorAll('tr');
@@ -114,9 +159,11 @@ class PromptLibraryApp {
   }
 
   /**
-   * @method _renderTable
-   * @description 根據目前的篩選條件來渲染主列表。
    * @private
+   * @method _renderTable
+   * @description 核心的 UI 渲染函式。
+   * 根據目前的搜尋關鍵字和已啟用的分類篩選條件，
+   * 過濾 `this.prompts` 陣列，並使用 `<template>` 動態生成提示詞列表。
    */
   _renderTable() {
     const { tableBody, searchInput } = this.elements;
@@ -141,7 +188,6 @@ class PromptLibraryApp {
       categoryLabel.textContent = prompt.category;
       categoryLabel.dataset.category = prompt.category;
       
-      // --- 【更新】使用新的視覺化函式來處理 prompt 文字 ---
       const promptMonoElement = row.querySelector('.prompt .mono');
       promptMonoElement.innerHTML = this._visualizePromptText(prompt.prompt);
       
@@ -154,8 +200,13 @@ class PromptLibraryApp {
     this._updateActiveFilters();
   }
 
+  /**
+   * @private
+   * @method _populateCategoryDropdowns
+   * @description 更新頁面上所有與分類相關的 `<select>` 下拉選單，
+   * 包含主篩選器和編輯視窗中的選單，確保它們同步顯示最新的分類列表。
+   */
   _populateCategoryDropdowns() {
-    // ... 此函式內容不變 ...
     const { categoryFilter, promptModal } = this.elements;
     const { categoryInput } = promptModal;
     const currentFilterValue = categoryFilter.value;
@@ -176,8 +227,12 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _renderCategoryChips
+   * @description 渲染位於主列表上方的可點擊分類標籤 (Chips)，提供更直觀的篩選方式。
+   */
   _renderCategoryChips() {
-    // ... 此函式內容不變 ...
     const { categoryChipsContainer } = this.elements;
     categoryChipsContainer.innerHTML = '';
     const allChip = document.createElement('span');
@@ -195,8 +250,13 @@ class PromptLibraryApp {
     this._updateActiveFilters();
   }
 
+  /**
+   * @private
+   * @method _updateActiveFilters
+   * @description 同步篩選器 UI 的狀態。根據 `this.activeCategories` 陣列的內容，
+   * 為對應的分類標籤 (Chip) 加上 'active' class，並更新下拉選單的選中項。
+   */
   _updateActiveFilters() {
-    // ... 此函式內容不變 ...
     const { categoryFilter, categoryChipsContainer } = this.elements;
     categoryChipsContainer.querySelectorAll('.chip').forEach(chip => {
       const category = chip.dataset.category;
@@ -209,9 +269,14 @@ class PromptLibraryApp {
       categoryFilter.value = 'all';
     }
   }
-
+    
+  /**
+   * @private
+   * @method _renderCategoryList
+   * @description 在「管理分類」彈出視窗中，渲染目前的分類列表。
+   * 如果某個分類已被提示詞使用，則其對應的刪除按鈕會被禁用。
+   */
   _renderCategoryList() {
-    // ... 此函式內容不變 ...
     const { list } = this.elements.categoryModal;
     list.innerHTML = '';
     this.categories.forEach(cat => {
@@ -220,11 +285,33 @@ class PromptLibraryApp {
     });
   }
 
-  _openModal(modalElement) { modalElement.classList.add('active'); }
-  _closeModal(modalElement) { modalElement.classList.remove('active'); }
+  /**
+   * @private
+   * @method _openModal
+   * @param {HTMLElement} modalElement - 要開啟的彈出視窗元素。
+   * @description 開啟彈出視窗的通用輔助函式。
+   */
+  _openModal(modalElement) {
+    modalElement.classList.add('active');
+  }
 
+  /**
+   * @private
+   * @method _closeModal
+   * @param {HTMLElement} modalElement - 要關閉的彈出視窗元素。
+   * @description 關閉彈出視窗的通用輔助函式。
+   */
+  _closeModal(modalElement) {
+    modalElement.classList.remove('active');
+  }
+    
+  /**
+   * @private
+   * @method _bindEventListeners
+   * @description 集中管理和綁定頁面上所有的事件監聽器。
+   * 這有助於將事件處理邏輯與其他業務邏輯分離，使程式碼更清晰。
+   */
   _bindEventListeners() {
-    // ... 此函式內容不變 ...
     const {
       searchInput, clearSearchBtn, categoryFilter, addNewBtn,
       manageCategoriesBtn, exportBtn, importBtn, fileImporter,
@@ -330,7 +417,13 @@ class PromptLibraryApp {
     });
   }
 
-  // ... 以下所有其他函式 (_handleTableClick, _openPromptModal, etc.) 都保持不變 ...
+  /**
+   * @private
+   * @method _handleTableClick
+   * @description 使用事件代理 (event delegation) 處理主列表中的按鈕點擊事件（複製、編輯、刪除）。
+   * 這樣可以避免為每一列的按鈕都單獨綁定監聽器，提升效能。
+   * @param {Event} e - 點擊事件對象。
+   */
   _handleTableClick(e) {
     const row = e.target.closest('.prompt-row');
     if (!row) return;
@@ -354,6 +447,13 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _openPromptModal
+   * @description 開啟新增或編輯提示詞的彈出視窗。
+   * @param {('add'|'edit')} mode - 'add' (新增) 或 'edit' (編輯) 模式。
+   * @param {string|null} id - 如果是編輯模式，則傳入提示詞的 Firestore 文件 ID。
+   */
   _openPromptModal(mode = 'add', id = null) {
     const { title, idInput, taskInput, categoryInput, promptInput, authorInput, historySelect } = this.elements.promptModal;
     this.isContentDirty = false;
@@ -393,6 +493,11 @@ class PromptLibraryApp {
     taskInput.focus();
   }
 
+  /**
+   * @private
+   * @method _closePromptModal
+   * @description 關閉新增/編輯視窗。如果表單內容有未儲存的變更，會彈出確認提示。
+   */
   _closePromptModal() {
     if (this.isContentDirty && !confirm('您有未儲存的變更，確定要關閉嗎？')) {
       return;
@@ -401,6 +506,13 @@ class PromptLibraryApp {
     this._closeModal(this.elements.promptModal.self);
   }
 
+  /**
+   * @private
+   * @method _savePrompt
+   * @description 儲存新增或編輯的提示詞到 Firestore。
+   * 執行瀏覽器內建的表單驗證，並根據是否有 ID 來判斷是執行新增還是更新操作。
+   * 更新時會將舊版本存入歷史紀錄。
+   */
   async _savePrompt() {
     const { form, idInput, taskInput, categoryInput, promptInput, authorInput } = this.elements.promptModal;
     if (!form.checkValidity()) {
@@ -445,6 +557,11 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _addNewCategory
+   * @description 在「管理分類」視窗中新增一個分類。
+   */
   _addNewCategory() {
     const { input } = this.elements.categoryModal;
     const newCat = input.value.trim();
@@ -457,6 +574,12 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _deleteCategory
+   * @description 刪除一個分類。
+   * @param {string} id - 要刪除的分類的 Firestore 文件 ID。
+   */
   _deleteCategory(id) {
     if (confirm('確定要刪除這個分類嗎？')) {
       this.db.collection("categories").doc(id).delete();
@@ -464,6 +587,12 @@ class PromptLibraryApp {
     }
   }
     
+  /**
+   * @private
+   * @method _previewHistory
+   * @description 在編輯視窗中預覽選定的歷史版本。
+   * @param {Event} e - 來自下拉選單的 change 事件對象。
+   */
   _previewHistory(e) {
     const { idInput, historyPreviewContainer, historyPreviewArea } = this.elements.promptModal;
     const id = idInput.value;
@@ -480,6 +609,11 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _restoreFromPreview
+   * @description 將預覽中的歷史版本內容還原到目前的編輯框中。
+   */
   _restoreFromPreview() {
     const { promptInput, historyPreviewArea } = this.elements.promptModal;
     if (confirm('您確定要用預覽的內容覆蓋目前的編輯嗎？')) {
@@ -489,12 +623,23 @@ class PromptLibraryApp {
     }
   }
   
+  /**
+   * @private
+   * @method _closePreview
+   * @description 關閉歷史版本預覽區塊。
+   */
   _closePreview() {
     const { historyPreviewContainer, historySelect } = this.elements.promptModal;
     historyPreviewContainer.style.display = 'none';
     if(historySelect) historySelect.value = '';
   }
 
+  /**
+   * @private
+   * @method _handleFileImport
+   * @description 處理透過檔案選擇器匯入的 JSON 檔案。
+   * @param {Event} event - 來自 file input 的 change 事件對象。
+   */
   _handleFileImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -509,6 +654,11 @@ class PromptLibraryApp {
     event.target.value = null;
   }
 
+  /**
+   * @private
+   * @method _handleManualImport
+   * @description 處理從文字框貼上內容的手動匯入。
+   */
   _handleManualImport() {
     const { textArea, self } = this.elements.manualImportModal;
     const content = textArea.value;
@@ -518,6 +668,13 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _processImportData
+   * @description 解析匯入的 JSON 字串，驗證格式，並呼叫寫入資料庫的函式。
+   * @param {string} jsonString - 包含匯入資料的 JSON 字串。
+   * @returns {boolean} - 回傳處理是否成功。
+   */
   async _processImportData(jsonString) {
     try {
       if (!jsonString) throw new Error("Input is empty.");
@@ -537,6 +694,13 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _importDataToFirestore
+   * @description 將解析後的資料批次寫入到 Firestore。
+   * @param {Array<object>} prompts - 要匯入的提示詞陣列。
+   * @param {Array<string>} categories - 要匯入的分類名稱陣列。
+   */
   async _importDataToFirestore(prompts, categories) {
     if (!this.db) return;
     this._showToast("正在匯入資料...");
@@ -550,14 +714,10 @@ class PromptLibraryApp {
     prompts.forEach(p => {
       const promptRef = this.db.collection("prompts").doc();
       batch.set(promptRef, {
-        task: p.task || "無標題",
-        category: p.category || "未分類",
-        prompt: p.prompt || "",
-        author: p.author || "Imported",
-        createdDate: new Date(),
-        lastModified: new Date(),
-        copyCount: p.copyCount || 0,
-        history: p.history || []
+        task: p.task || "無標題", category: p.category || "未分類",
+        prompt: p.prompt || "", author: p.author || "Imported",
+        createdDate: new Date(), lastModified: new Date(),
+        copyCount: p.copyCount || 0, history: p.history || []
       });
     });
     try {
@@ -570,6 +730,12 @@ class PromptLibraryApp {
     }
   }
     
+  /**
+   * @private
+   * @method _exportData
+   * @description 將目前的提示詞庫資料匯出成一個 JSON 檔案。
+   * 在匯出前會清理資料，將 Firestore 特有的 Timestamp 物件轉換為標準的 ISO 字串格式。
+   */
   _exportData() {
     try {
       const sanitizedPrompts = this.prompts.map(p => {
@@ -603,6 +769,13 @@ class PromptLibraryApp {
     }
   }
 
+  /**
+   * @private
+   * @method _showToast
+   * @description 顯示一個短暫的提示訊息（Toast Notification）。
+   * @param {string} message - 要顯示的訊息。
+   * @param {('success'|'error')} [type='success'] - 提示的類型，決定其顏色。
+   */
   _showToast(message, type = 'success') {
     const toastContainer = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -616,12 +789,23 @@ class PromptLibraryApp {
     }, 3000);
   }
 
+  /**
+   * @private
+   * @method _toggleClearSearchBtn
+   * @description 根據搜尋框中是否有文字，來顯示或隱藏「清除」按鈕。
+   */
   _toggleClearSearchBtn() {
       if(this.elements.searchInput) {
           this.elements.clearSearchBtn.style.display = this.elements.searchInput.value.length > 0 ? 'block' : 'none';
       }
   }
 
+  /**
+   * @private
+   * @method _populateHistory
+   * @description 填充編輯視窗中的歷史版本下拉選單。
+   * @param {object} prompt - 包含歷史紀錄的提示詞物件。
+   */
   _populateHistory(prompt) {
     const { historySelect } = this.elements.promptModal;
     historySelect.innerHTML = '<option value="">檢視歷史版本...</option>';
@@ -637,22 +821,24 @@ class PromptLibraryApp {
   }
   
   /**
-   * @method _escapeHTML
-   * @description 轉換特殊字元為 HTML 實體，防止 XSS 攻擊。
-   * @param {string} str - 原始字串
-   * @returns {string} - 處理過的字串
    * @private
+   * @method _escapeHTML
+   * @description 轉換特殊字元為 HTML 實體，防止 XSS (跨站腳本攻擊)。
+   * 這是在使用 `innerHTML` 插入來自使用者或資料庫的內容時，一個重要的安全措施。
+   * @param {string} str - 原始字串。
+   * @returns {string} - 經過轉義處理的安全字串。
    */
   _escapeHTML(str) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   }
 
   /**
-   * @method _visualizePromptText
-   * @description 將 prompt 文字中的 {{變數}} 替換為帶有高亮樣式的 HTML 標籤。
-   * @param {string} text - 原始 prompt 文字
-   * @returns {string} - 包含 HTML 標籤的字串
    * @private
+   * @method _visualizePromptText
+   * @description 將 prompt 文字中的 `{{變數}}` 替換為帶有高亮樣式的 HTML `<span>` 標籤。
+   * 它首先使用 `_escapeHTML` 確保內容安全，然後才進行替換。
+   * @param {string} text - 原始 prompt 文字。
+   * @returns {string} - 處理後，包含高亮標籤的 HTML 字串。
    */
   _visualizePromptText(text) {
       if (!text) return '';
@@ -664,7 +850,11 @@ class PromptLibraryApp {
 
 }
 
-// --- 應用程式啟動 ---
+/**
+ * @description 應用程式啟動入口。
+ * 監聽 DOMContentLoaded 事件，確保在 HTML 文件完全載入並解析完畢後，
+ * 才建立 PromptLibraryApp 的實例並啟動它。
+ */
 document.addEventListener('DOMContentLoaded', () => {
   const app = new PromptLibraryApp();
   app.init();
