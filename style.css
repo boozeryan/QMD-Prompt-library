@@ -1,17 +1,20 @@
+/* --- 全域色彩與變數定義 --- */
+/* 使用 CSS 變數可以方便地統一管理與修改網站的色彩主題 */
 :root {
-    --bg: #021707;
-    --panel: #0f172a;
+    --bg: #021707; /* 主要背景色 */
+    --panel: #0f172a; /* 面板背景色 */
     --card: #111827;
-    --muted: #94a3b8;
-    --text: #f8fafc;
-    --accent: #0ea5e9;
-    --accent-2: #8b5cf6;
-    --chip: #1f2937;
-    --border: #334155;
-    --btn-success: #22c55e;
-    --btn-danger: #ef4444;
+    --muted: #94a3b8; /* 次要文字、圖示顏色 */
+    --text: #f8fafc; /* 主要文字顏色 */
+    --accent: #0ea5e9; /* 強調色 1 (藍色系) */
+    --accent-2: #8b5cf6; /* 強調色 2 (紫色系) */
+    --chip: #1f2937; /* 標籤背景色 */
+    --border: #334155; /* 邊框顏色 */
+    --btn-success: #22c55e; /* 成功按鈕顏色 */
+    --btn-danger: #ef4444; /* 危險/刪除按鈕顏色 */
 }
 
+/* --- 基礎與全域樣式 --- */
 html,
 body {
     height: 100%;
@@ -20,13 +23,14 @@ body {
 body {
     margin: 0;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji";
-    background: linear-gradient(160deg, var(--bg), #030712 60%);
+    background: linear-gradient(160deg, var(--bg), #030712 60%); /* 漸層背景 */
     color: var(--text);
 }
 
+/* --- 主要佈局容器 --- */
 .wrap {
-    max-width: 1200px;
-    margin: 40px auto;
+    max-width: 1200px; /* 限制最大寬度，避免在寬螢幕上過度伸展 */
+    margin: 40px auto; /* 上下邊距 40px，左右自動置中 */
     padding: 0 16px;
 }
 
@@ -35,15 +39,12 @@ header {
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-between; /* 標題和徽章分置左右 */
 }
 
 .title {
-    font-size: clamp(22px, 3vw, 34px);
+    font-size: clamp(22px, 3vw, 34px); /* 流動字體大小，隨視窗寬度變化 */
     font-weight: 800;
-    letter-spacing: .4px;
-    display: flex;
-    align-items: baseline;
 }
 
 .badge {
@@ -52,21 +53,22 @@ header {
     gap: 8px;
     padding: 6px 10px;
     border: 1px solid var(--border);
-    border-radius: 999px;
+    border-radius: 999px; /* 圓角膠囊形狀 */
     background: rgba(255, 255, 255, 0.02);
     color: var(--muted);
 }
 
+/* --- 格線與面板樣式 --- */
 .grid {
     display: grid;
     gap: 16px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* 預設單欄佈局 */
 }
 
 .panel {
     border: 1px solid var(--border);
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.03); /* 半透明背景 */
 }
 
 .panel h2 {
@@ -79,13 +81,9 @@ header {
 
 .panel .content {
     padding: 16px 18px;
-    color: var(--text);
 }
 
-.muted {
-    color: var(--muted);
-}
-
+/* --- 工具列與表單控制項樣式 --- */
 .toolbar {
     display: flex;
     gap: 10px;
@@ -97,7 +95,7 @@ header {
 .search-controls {
     display: flex;
     gap: 10px;
-    flex-grow: 1;
+    flex-grow: 1; /* 讓搜尋區塊自動填滿可用空間 */
     min-width: 300px;
 }
 
@@ -108,10 +106,11 @@ header {
 }
 
 .search {
-    position: relative;
+    position: relative; /* 為了定位清除按鈕 */
     flex-grow: 1;
 }
 
+/* 通用的輸入框、文字區、下拉選單樣式 */
 input[type="text"],
 textarea,
 select {
@@ -122,15 +121,15 @@ select {
     padding: 10px 12px;
     border-radius: 10px;
     outline: none;
-    box-sizing: border-box;
+    box-sizing: border-box; /* 讓 padding 和 border 不會增加元素總寬度 */
 }
 
 input[type="text"] {
-    padding-right: 35px;
+    padding-right: 35px; /* 為清除按鈕留出空間 */
 }
 
 .clear-search-btn {
-    position: absolute;
+    position: absolute; /* 相對於 .search 定位 */
     right: 1px;
     top: 1px;
     bottom: 1px;
@@ -140,13 +139,14 @@ input[type="text"] {
     font-size: 20px;
     cursor: pointer;
     padding: 0 10px;
-    display: none;
+    display: none; /* 預設隱藏，由 JS 控制顯示 */
 }
 
 .clear-search-btn:hover {
     color: var(--text);
 }
 
+/* --- 按鈕樣式 --- */
 .btn {
     appearance: none;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -159,42 +159,30 @@ input[type="text"] {
     transition: transform .05s ease, background .2s;
 }
 
-.btn-action {
-    background: var(--accent);
-    color: white;
-    padding: 8px 12px;
-}
-
-.btn-danger {
-    background: var(--btn-danger);
-    color: white;
-    padding: 8px 12px;
-}
-
-.btn-success {
-    background: var(--btn-success);
-    color: white;
-    padding: 8px 12px;
-}
+.btn-action { background: var(--accent); color: white; padding: 8px 12px; }
+.btn-danger { background: var(--btn-danger); color: white; padding: 8px 12px; }
+.btn-success { background: var(--btn-success); color: white; padding: 8px 12px; }
 
 .btn:active {
-    transform: scale(0.98);
+    transform: scale(0.98); /* 點擊時的微小縮放效果 */
 }
 
-.btn-primary {
-    padding: 10px 18px;
+.ghost { /* "鬼影" 按鈕，透明背景帶邊框 */
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
 }
 
+/* --- 主表格樣式 --- */
 table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden;
-    border-radius: 14px;
 }
 
 thead th {
-    position: sticky;
+    position: sticky; /* 表頭在滾動時固定在頂部 */
     top: 0;
     background: #0b1220;
     text-align: left;
@@ -214,10 +202,7 @@ tbody td {
     background: rgba(255, 255, 255, 0.02);
 }
 
-.task {
-    font-weight: 700;
-}
-
+/* --- 分類標籤 (Chips) 樣式 --- */
 .chips {
     display: flex;
     flex-wrap: wrap;
@@ -232,7 +217,6 @@ tbody td {
     border-radius: 999px;
     font-size: 11px;
     color: var(--muted);
-    display: inline-block;
 }
 
 .chip.clickable {
@@ -245,44 +229,33 @@ tbody td {
     color: var(--text);
 }
 
-.chip.active {
+.chip.active { /* 被選中時的樣式 */
     background-color: var(--accent);
     color: white;
     border-color: var(--accent);
     font-weight: 600;
 }
 
-.prompt {
-    white-space: pre-wrap;
-    max-height: 90px;
-    overflow: hidden;
-    transition: max-height .3s;
-}
-
-/* --- 【【【【【 關鍵修正點 1 】】】】】 --- */
-/* 拿掉了衝突的 display:flex 和 gap，讓它回歸正常的表格欄位 */
+/* --- 表格列中的操作按鈕 --- */
 .row-tools {
     white-space: nowrap; /* 防止按鈕在視窗縮小時換行 */
 }
 
-/* --- 【【【【【 關鍵修正點 2 】】】】】 --- */
-/* 針對操作欄位，強制指定其垂直對齊方式為"底部" */
 tbody td.row-tools {
-    vertical-align: bottom;
+    vertical-align: bottom; /* 操作按鈕垂直置底 */
 }
-
 
 .icon-btn {
     background: transparent;
     border: none;
     padding: 6px;
-    border-radius: 999px;
+    border-radius: 999px; /* 圓形按鈕 */
     cursor: pointer;
     transition: background-color .2s;
-    display: inline-flex; /* 改為 inline-flex 讓它能跟其他按鈕並排 */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 2px; /* 用 margin 取代 gap */
+    margin-left: 2px;
 }
 .icon-btn:first-child {
     margin-left: 0;
@@ -299,45 +272,11 @@ tbody td.row-tools {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.icon-btn:hover svg {
-    stroke: var(--accent);
-}
+.icon-btn:hover svg { stroke: var(--accent); }
+.icon-btn.delete:hover svg { stroke: var(--btn-danger); }
 
-.icon-btn.delete:hover svg {
-    stroke: var(--btn-danger);
-}
 
-.ghost {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-}
-
-.small {
-    font-size: 12px;
-}
-
-.footer {
-    color: var(--muted);
-    font-size: 12px;
-    text-align: center;
-    margin: 24px 0 40px;
-}
-
-.hl {
-    color: var(--accent);
-}
-
-.hl-danger {
-    color: var(--btn-danger);
-    font-weight: 600;
-}
-
-.note {
-    font-size: 14px;
-    line-height: 1.8;
-}
-
+/* --- 說明區塊樣式 --- */
 .note-columns {
     display: flex;
     gap: 24px;
@@ -349,57 +288,30 @@ tbody td.row-tools {
 }
 
 @media (max-width: 768px) {
+    /* 在小螢幕上，將左右兩欄變為上下堆疊 */
     .note-columns {
         flex-direction: column;
     }
 }
 
-.note h4 {
-    color: var(--accent);
-    margin-top: 20px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-}
-
-.note h4:first-child {
-    margin-top: 0;
-}
-
-.note ul {
-    padding-left: 20px;
-    margin: 0;
-}
-
-.note li {
-    margin-bottom: 12px;
-}
-
-.mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 2px 5px;
-    border-radius: 4px;
-    font-size: 0.9em;
-}
-
+/* --- 彈出視窗 (Modal) 樣式 --- */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.7); /* 半透明黑色背景 */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
+    opacity: 0; /* 預設透明 */
+    visibility: hidden; /* 預設隱藏 */
     transition: opacity .3s, visibility .3s;
 }
 
-.modal-overlay.active {
+.modal-overlay.active { /* 當 JS 加上 .active class 時，顯示 Modal */
     opacity: 1;
     visibility: visible;
 }
@@ -410,22 +322,24 @@ tbody td.row-tools {
     border-radius: 14px;
     width: 90%;
     max-width: 800px;
-    max-height: 90vh;
+    max-height: 90vh; /* 避免視窗內容過長超出螢幕 */
     display: flex;
     flex-direction: column;
-    transform: scale(0.95);
+    transform: scale(0.95); /* 預設稍微縮小，製造動畫效果 */
     transition: transform .3s;
 }
 
 .active .modal-container {
-    transform: scale(1);
+    transform: scale(1); /* 啟用時放大回正常尺寸 */
+}
+
+.modal-header, .modal-content, .modal-footer {
+    padding: 16px 24px;
 }
 
 .modal-header {
-    padding: 16px 24px;
     border-bottom: 1px solid var(--border);
     font-size: 18px;
-    font-weight: 700;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -440,13 +354,11 @@ tbody td.row-tools {
 }
 
 .modal-content {
-    padding: 24px;
-    overflow-y: auto;
+    overflow-y: auto; /* 當內容過多時，允許垂直滾動 */
     flex: 1;
 }
 
 .modal-footer {
-    padding: 16px 24px;
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: flex-end;
@@ -454,6 +366,7 @@ tbody td.row-tools {
     align-items: center;
 }
 
+/* --- 彈出視窗內的表單樣式 --- */
 .form-group {
     margin-bottom: 16px;
 }
@@ -465,12 +378,7 @@ tbody td.row-tools {
     color: var(--muted);
 }
 
-.history-select {
-    width: auto;
-    min-width: 200px;
-    margin-right: auto;
-}
-
+/* 歷史版本相關樣式 */
 #historyPreviewContainer {
     margin-top: 16px;
     padding-top: 16px;
@@ -481,14 +389,15 @@ tbody td.row-tools {
     min-height: 100px;
     background-color: rgba(0, 0, 0, 0.2);
     opacity: 0.8;
-    resize: none;
+    resize: none; /* 禁止使用者調整大小 */
 }
 
+/* --- 提示訊息 (Toast) 樣式 --- */
 .toast-container {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 2000;
+    z-index: 2000; /* 確保在最上層 */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -500,37 +409,21 @@ tbody td.row-tools {
     color: white;
     font-size: 14px;
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(100%); /* 預設位置在畫面右側外 */
     transition: all .4s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .toast.show {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0); /* 滑入畫面 */
 }
 
-.toast.success {
-    background-color: var(--btn-success);
-}
+.toast.success { background-color: var(--btn-success); }
+.toast.error { background-color: var(--btn-danger); }
 
-.toast.error {
-    background-color: var(--btn-danger);
-}
 
-.meta-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px 12px;
-    margin-top: 8px;
-}
-
-.meta-item {
-    font-size: 11px;
-    color: var(--muted);
-}
-
+/* --- 管理分類列表樣式 --- */
 #categoryList {
     list-style: none;
     padding: 0;
@@ -545,7 +438,7 @@ tbody td.row-tools {
     padding: 8px;
     border-radius: 6px;
 }
-
+/* 斑馬條紋效果 */
 #categoryList li:nth-child(odd) {
     background: rgba(255, 255, 255, 0.03);
 }
@@ -554,17 +447,4 @@ tbody td.row-tools {
     display: flex;
     gap: 10px;
     margin-top: 20px;
-}
-
-#newCategoryInput {
-    flex: 1;
-}
-
-#manualImportText {
-    min-height: 200px;
-}
-
-#manualImportLink {
-    text-decoration: underline;
-    cursor: pointer;
 }
