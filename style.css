@@ -1,17 +1,16 @@
 /* --- 全域色彩與變數定義 --- */
-/* 使用 CSS 變數可以方便地統一管理與修改網站的色彩主題 */
 :root {
-    --bg: #021707; /* 主要背景色 */
-    --panel: #0f172a; /* 面板背景色 */
+    --bg: #021707;
+    --panel: #0f172a;
     --card: #111827;
-    --muted: #94a3b8; /* 次要文字、圖示顏色 */
-    --text: #f8fafc; /* 主要文字顏色 */
-    --accent: #0ea5e9; /* 強調色 1 (藍色系) */
-    --accent-2: #8b5cf6; /* 強調色 2 (紫色系) */
-    --chip: #1f2937; /* 標籤背景色 */
-    --border: #334155; /* 邊框顏色 */
-    --btn-success: #22c55e; /* 成功按鈕顏色 */
-    --btn-danger: #ef4444; /* 危險/刪除按鈕顏色 */
+    --muted: #94a3b8;
+    --text: #f8fafc;
+    --accent: #0ea5e9;
+    --accent-2: #8b5cf6;
+    --chip: #1f2937;
+    --border: #334155;
+    --btn-success: #22c55e;
+    --btn-danger: #ef4444;
 }
 
 /* --- 基礎與全域樣式 --- */
@@ -23,14 +22,14 @@ body {
 body {
     margin: 0;
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji";
-    background: linear-gradient(160deg, var(--bg), #030712 60%); /* 漸層背景 */
+    background: linear-gradient(160deg, var(--bg), #030712 60%);
     color: var(--text);
 }
 
 /* --- 主要佈局容器 --- */
 .wrap {
-    max-width: 1200px; /* 限制最大寬度，避免在寬螢幕上過度伸展 */
-    margin: 40px auto; /* 上下邊距 40px，左右自動置中 */
+    max-width: 1400px; /* 稍微加寬以適應三欄式佈局 */
+    margin: 40px auto;
     padding: 0 16px;
 }
 
@@ -39,11 +38,12 @@ header {
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
-    justify-content: space-between; /* 標題和徽章分置左右 */
+    justify-content: space-between;
+    margin-bottom: 24px; /* 增加與下方佈局的間距 */
 }
 
 .title {
-    font-size: clamp(22px, 3vw, 34px); /* 流動字體大小，隨視窗寬度變化 */
+    font-size: clamp(22px, 3vw, 34px);
     font-weight: 800;
 }
 
@@ -53,22 +53,16 @@ header {
     gap: 8px;
     padding: 6px 10px;
     border: 1px solid var(--border);
-    border-radius: 999px; /* 圓角膠囊形狀 */
+    border-radius: 999px;
     background: rgba(255, 255, 255, 0.02);
     color: var(--muted);
 }
 
-/* --- 格線與面板樣式 --- */
-.grid {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: 1fr; /* 預設單欄佈局 */
-}
-
+/* --- 面板樣式 --- */
 .panel {
     border: 1px solid var(--border);
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.03); /* 半透明背景 */
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .panel h2 {
@@ -95,7 +89,7 @@ header {
 .search-controls {
     display: flex;
     gap: 10px;
-    flex-grow: 1; /* 讓搜尋區塊自動填滿可用空間 */
+    flex-grow: 1;
     min-width: 300px;
 }
 
@@ -106,11 +100,10 @@ header {
 }
 
 .search {
-    position: relative; /* 為了定位清除按鈕 */
+    position: relative;
     flex-grow: 1;
 }
 
-/* 通用的輸入框、文字區、下拉選單樣式 */
 input[type="text"],
 textarea,
 select {
@@ -121,15 +114,15 @@ select {
     padding: 10px 12px;
     border-radius: 10px;
     outline: none;
-    box-sizing: border-box; /* 讓 padding 和 border 不會增加元素總寬度 */
+    box-sizing: border-box;
 }
 
 input[type="text"] {
-    padding-right: 35px; /* 為清除按鈕留出空間 */
+    padding-right: 35px;
 }
 
 .clear-search-btn {
-    position: absolute; /* 相對於 .search 定位 */
+    position: absolute;
     right: 1px;
     top: 1px;
     bottom: 1px;
@@ -139,7 +132,7 @@ input[type="text"] {
     font-size: 20px;
     cursor: pointer;
     padding: 0 10px;
-    display: none; /* 預設隱藏，由 JS 控制顯示 */
+    display: none;
 }
 
 .clear-search-btn:hover {
@@ -164,13 +157,21 @@ input[type="text"] {
 .btn-success { background: var(--btn-success); color: white; padding: 8px 12px; }
 
 .btn:active {
-    transform: scale(0.98); /* 點擊時的微小縮放效果 */
+    transform: scale(0.98);
 }
 
-.ghost { /* "鬼影" 按鈕，透明背景帶邊框 */
+.btn-primary {
+    padding: 10px 18px;
+}
+
+.ghost {
     background: transparent;
     color: var(--muted);
     border: 1px solid var(--border);
+}
+
+.small {
+    font-size: 12px;
 }
 
 /* --- 主表格樣式 --- */
@@ -178,11 +179,10 @@ table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    overflow: hidden;
 }
 
 thead th {
-    position: sticky; /* 表頭在滾動時固定在頂部 */
+    position: sticky;
     top: 0;
     background: #0b1220;
     text-align: left;
@@ -202,7 +202,7 @@ tbody td {
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* --- 分類標籤 (Chips) 樣式 --- */
+/* --- 其他元件樣式 --- */
 .chips {
     display: flex;
     flex-wrap: wrap;
@@ -218,233 +218,110 @@ tbody td {
     font-size: 11px;
     color: var(--muted);
 }
+.chip.clickable { cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.chip.clickable:hover { background: var(--border); color: var(--text); }
+.chip.active { background-color: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
 
-.chip.clickable {
-    cursor: pointer;
-    transition: background .2s, color .2s, border-color .2s;
-}
-
-.chip.clickable:hover {
-    background: var(--border);
-    color: var(--text);
-}
-
-.chip.active { /* 被選中時的樣式 */
-    background-color: var(--accent);
-    color: white;
-    border-color: var(--accent);
-    font-weight: 600;
-}
-
-/* --- 表格列中的操作按鈕 --- */
 .row-tools {
-    white-space: nowrap; /* 防止按鈕在視窗縮小時換行 */
+    white-space: nowrap;
 }
-
 tbody td.row-tools {
-    vertical-align: bottom; /* 操作按鈕垂直置底 */
+    vertical-align: bottom;
 }
-
 .icon-btn {
-    background: transparent;
-    border: none;
-    padding: 6px;
-    border-radius: 999px; /* 圓形按鈕 */
-    cursor: pointer;
-    transition: background-color .2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 2px;
+    background: transparent; border: none; padding: 6px; border-radius: 999px; cursor: pointer;
+    transition: background-color .2s; display: inline-flex; align-items: center; justify-content: center; margin-left: 2px;
 }
-.icon-btn:first-child {
-    margin-left: 0;
-}
-
-.icon-btn svg {
-    width: 16px;
-    height: 16px;
-    stroke: var(--muted);
-    transition: stroke .2s;
-}
-
-.icon-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
+.icon-btn:first-child { margin-left: 0; }
+.icon-btn svg { width: 16px; height: 16px; stroke: var(--muted); transition: stroke .2s; }
+.icon-btn:hover { background-color: rgba(255, 255, 255, 0.1); }
 .icon-btn:hover svg { stroke: var(--accent); }
 .icon-btn.delete:hover svg { stroke: var(--btn-danger); }
 
-
 /* --- 說明區塊樣式 --- */
-.note-columns {
-    display: flex;
-    gap: 24px;
+.note {
+    font-size: 14px;
+    line-height: 1.8;
 }
-
-.note-column {
-    flex: 1;
-    min-width: 0;
+.note h4 {
+    color: var(--accent);
+    margin-top: 20px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
 }
-
-@media (max-width: 768px) {
-    /* 在小螢幕上，將左右兩欄變為上下堆疊 */
-    .note-columns {
-        flex-direction: column;
-    }
-}
+.note h4:first-child { margin-top: 0; }
+.note ul { padding-left: 20px; margin: 0; }
+.note li { margin-bottom: 12px; }
 
 /* --- 彈出視窗 (Modal) 樣式 --- */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* 半透明黑色背景 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0; /* 預設透明 */
-    visibility: hidden; /* 預設隱藏 */
-    transition: opacity .3s, visibility .3s;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+    opacity: 0; visibility: hidden; transition: opacity .3s, visibility .3s;
 }
-
-.modal-overlay.active { /* 當 JS 加上 .active class 時，顯示 Modal */
-    opacity: 1;
-    visibility: visible;
-}
-
+.modal-overlay.active { opacity: 1; visibility: visible; }
 .modal-container {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 90vh; /* 避免視窗內容過長超出螢幕 */
-    display: flex;
-    flex-direction: column;
-    transform: scale(0.95); /* 預設稍微縮小，製造動畫效果 */
-    transition: transform .3s;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    width: 90%; max-width: 800px; max-height: 90vh;
+    display: flex; flex-direction: column;
+    transform: scale(0.95); transition: transform .3s;
 }
-
-.active .modal-container {
-    transform: scale(1); /* 啟用時放大回正常尺寸 */
-}
-
-.modal-header, .modal-content, .modal-footer {
-    padding: 16px 24px;
-}
-
-.modal-header {
-    border-bottom: 1px solid var(--border);
-    font-size: 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header .close-btn {
-    cursor: pointer;
-    font-size: 24px;
-    color: var(--muted);
-    background: none;
-    border: none;
-}
-
-.modal-content {
-    overflow-y: auto; /* 當內容過多時，允許垂直滾動 */
-    flex: 1;
-}
-
-.modal-footer {
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    align-items: center;
-}
-
-/* --- 彈出視窗內的表單樣式 --- */
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: var(--muted);
-}
-
-/* 歷史版本相關樣式 */
-#historyPreviewContainer {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px dashed var(--border);
-}
-
-#historyPreviewArea {
-    min-height: 100px;
-    background-color: rgba(0, 0, 0, 0.2);
-    opacity: 0.8;
-    resize: none; /* 禁止使用者調整大小 */
-}
+.active .modal-container { transform: scale(1); }
+.modal-header { padding: 16px 24px; border-bottom: 1px solid var(--border); font-size: 18px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.modal-header .close-btn { cursor: pointer; font-size: 24px; color: var(--muted); background: none; border: none; }
+.modal-content { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; align-items: center; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--muted); }
+#historyPreviewContainer { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }
+#historyPreviewArea { min-height: 100px; background-color: rgba(0, 0, 0, 0.2); opacity: 0.8; resize: none; }
 
 /* --- 提示訊息 (Toast) 樣式 --- */
-.toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000; /* 確保在最上層 */
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
 .toast {
-    padding: 12px 20px;
-    border-radius: 8px;
-    color: white;
-    font-size: 14px;
-    opacity: 0;
-    transform: translateX(100%); /* 預設位置在畫面右側外 */
-    transition: all .4s ease;
+    padding: 12px 20px; border-radius: 8px; color: white; font-size: 14px;
+    opacity: 0; transform: translateX(100%); transition: all .4s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
-.toast.show {
-    opacity: 1;
-    transform: translateX(0); /* 滑入畫面 */
-}
-
+.toast.show { opacity: 1; transform: translateX(0); }
 .toast.success { background-color: var(--btn-success); }
 .toast.error { background-color: var(--btn-danger); }
 
-
 /* --- 管理分類列表樣式 --- */
-#categoryList {
-    list-style: none;
-    padding: 0;
-    max-height: 40vh;
-    overflow-y: auto;
+#categoryList { list-style: none; padding: 0; max-height: 40vh; overflow-y: auto; }
+#categoryList li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
+#categoryList li:nth-child(odd) { background: rgba(255, 255, 255, 0.03); }
+#newCategoryForm { display: flex; gap: 10px; margin-top: 20px; }
+
+/* --- 頁尾 --- */
+.footer {
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+    margin: 24px 0 40px;
 }
 
-#categoryList li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-radius: 6px;
-}
-/* 斑馬條紋效果 */
-#categoryList li:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.03);
+/* --- 【新】主要三欄式佈局 --- */
+.main-layout {
+    display: grid;
+    /* 定義三欄的寬度比例：左1 右1，中間佔據剩餘空間的3倍 */
+    grid-template-columns: 1fr 3fr 1fr; 
+    gap: 16px; /* 欄位之間的間距 */
+    align-items: start; /* 讓欄位頂部對齊 */
 }
 
-#newCategoryForm {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
+/* 中間主內容區塊內的面板預設是堆疊的 */
+.layout-main {
+    display: grid;
+    gap: 16px;
+}
+
+/* --- 【新】響應式設計 --- */
+/* 當螢幕寬度小於或等於 1024px 時，套用以下樣式 */
+@media (max-width: 1024px) {
+    .main-layout {
+        /* 將三欄佈局改為單欄，欄位會自動垂直堆疊 */
+        grid-template-columns: 1fr;
+    }
 }
