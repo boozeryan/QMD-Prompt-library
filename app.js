@@ -191,7 +191,7 @@ class PromptLibraryApp {
       const promptMonoElement = row.querySelector('.prompt .mono');
       promptMonoElement.innerHTML = this._visualizePromptText(prompt.prompt);
       
-      row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount || 0} 次`;
+      // row.querySelector('.copy-count').textContent = `複製 ${prompt.copyCount || 0} 次`; //
       row.querySelector('.author').textContent = `作者: ${prompt.author || 'N/A'}`;
       const lastModifiedDate = prompt.lastModified && prompt.lastModified.toDate ? prompt.lastModified.toDate() : new Date();
       row.querySelector('.last-modified').textContent = `更新: ${lastModifiedDate.toLocaleDateString()}`;
@@ -859,3 +859,4 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new PromptLibraryApp();
   app.init();
 });
+
