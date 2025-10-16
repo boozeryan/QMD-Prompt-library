@@ -276,15 +276,27 @@ class PromptLibraryApp {
    * @description 在「管理分類」彈出視窗中，渲染目前的分類列表。
    * 如果某個分類已被提示詞使用，則其對應的刪除按鈕會被禁用。
    */
-  _renderCategoryList() {
+ _renderCategoryList() {
     const { list } = this.elements.categoryModal;
     list.innerHTML = '';
     this.categories.forEach(cat => {
       const isUsed = this.prompts.some(p => p.category === cat.name);
-      list.innerHTML += `<li><span>${cat.name}</span><button class="btn small btn-danger" data-id="${cat.id}" ${isUsed ? 'disabled title="分類使用中，無法刪除"' : ''}>刪除</button></li>`;
+      const escapedName = this._escapeHTML(cat.name);
+      // 為每個 li 項目產生包含一般和編輯模式所需的所有 HTML 元素
+      list.innerHTML += `
+        <li data-id="${cat.id}" data-name="${escapedName}">
+          <span class="category-name">${escapedName}</span>
+          <input type="text" class="edit-input" value="${escapedName}">
+          <div class="category-actions">
+            <button class="btn small btn-success btn-save">儲存</button>
+            <button class="btn small ghost btn-cancel">取消</button>
+            <button class="btn small ghost btn-edit">編輯</button>
+            <button class="btn small btn-danger" ${isUsed ? 'disabled title="分類使用中，無法刪除"' : ''}>刪除</button>
+          </div>
+        </li>
+      `;
     });
   }
-
   /**
    * @private
    * @method _openModal
@@ -395,8 +407,36 @@ class PromptLibraryApp {
       e.preventDefault();
       this._addNewCategory();
     });
-    categoryList.addEventListener('click', e => {
-      if (e.target.tagName === 'BUTTON') this._deleteCategory(e.target.dataset.id);
+   categoryList.addEventListener('click', e => {
+      const target = e.target;
+      const li = target.closest('li');
+      if (!li) return;
+
+      const id = li.dataset.id;
+      const currentName = li.dataset.name;
+      
+      // 處理「編輯」按鈕點擊
+      if (target.classList.contains('btn-edit')) {
+        const currentlyEditing = categoryList.querySelector('li.editing');
+        if (currentlyEditing) {
+            currentlyEditing.classList.remove('editing');
+        }
+        li.classList.add('editing');
+        li.querySelector('.edit-input').focus();
+      }
+      // 處理「取消」按鈕點擊
+      else if (target.classList.contains('btn-cancel')) {
+        li.classList.remove('editing');
+        li.querySelector('.edit-input').value = currentName;
+      }
+      // 處理「儲存」按鈕點擊
+      else if (target.classList.contains('btn-save')) {
+        this._saveCategoryEdit(li);
+      }
+      // 處理「刪除」按鈕點擊
+      else if (target.classList.contains('btn-danger')) {
+        this._deleteCategory(id);
+      }
     });
     manualImportModal.addEventListener('click', e => {
       if (e.target === manualImportModal || e.target.classList.contains('close-btn')) this._closeModal(manualImportModal);
@@ -586,7 +626,64 @@ class PromptLibraryApp {
       this._showToast('分類已刪除', 'error');
     }
   }
+  /**
+   * @private
+   * @method _saveCategoryEdit
+   * @description 儲存分類名稱的編輯。使用批次寫入來確保資料一致性。
+   * @param {HTMLLIElement} li - 被編輯的列表項元素。
+   */
+  async _saveCategoryEdit(li) {
+    const id = li.dataset.id;
+    const oldName = li.dataset.name;
+    const input = li.querySelector('.edit-input');
+    const newName = input.value.trim();
+
+    // --- 驗證 ---
+    if (!newName) {
+      this._showToast('分類名稱不能為空', 'error');
+      return;
+    }
+    if (newName === oldName) {
+      li.classList.remove('editing');
+      return;
+    }
+    if (this.categories.some(cat => cat.name.toLowerCase() === newName.toLowerCase() && cat.id !== id)) {
+      this._showToast('該分類名稱已存在', 'error');
+      return;
+    }
+
+    // --- Firestore 批次更新 ---
+    this._showToast('正在更新分類...');
+    const batch = this.db.batch();
     
+    // 1. 更新 categories 集合中的分類文件
+    const categoryRef = this.db.collection('categories').doc(id);
+    batch.update(categoryRef, { name: newName });
+
+    // 2. 查詢 prompts 集合中所有使用舊分類名稱的文件
+    const promptsToUpdateQuery = this.db.collection('prompts').where('category', '==', oldName);
+    
+    try {
+      const snapshot = await promptsToUpdateQuery.get();
+      if (!snapshot.empty) {
+        snapshot.docs.forEach(doc => {
+          // 3. 將這些 prompt 文件的 category 欄位更新為新名稱
+          batch.update(doc.ref, { category: newName });
+        });
+      }
+      
+      // 4. 提交所有更新操作
+      await batch.commit();
+
+      li.classList.remove('editing');
+      this._showToast('分類名稱更新成功！');
+    } catch (e) {
+      console.error("更新分類失敗:", e);
+      this._showToast("更新分類時發生錯誤。", "error");
+      li.classList.remove('editing');
+      input.value = oldName; // 出錯時還原輸入框內容
+    }
+  }  
   /**
    * @private
    * @method _previewHistory
@@ -859,5 +956,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new PromptLibraryApp();
   app.init();
 });
+
 
 
