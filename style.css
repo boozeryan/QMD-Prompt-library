@@ -224,22 +224,65 @@ tbody td.row-tools { vertical-align: bottom; }
 
 /* --- 管理分類列表樣式 --- */
 #categoryList { list-style: none; padding: 0; max-height: 40vh; overflow-y: auto; }
-#categoryList li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
+#categoryList li { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 8px; 
+    border-radius: 6px; 
+    gap: 8px; /* 新增: 增加元素間距 */
+}
 #categoryList li:nth-child(odd) { background: rgba(255, 255, 255, 0.03); }
+
+/* --- 【以下為新增/修改的程式碼】 --- */
+
+/* 分類名稱 和 輸入框 佔用可用空間 */
+#categoryList li > .category-name,
+#categoryList li > .edit-input {
+    flex-grow: 1;
+}
+
+/* 讓操作按鈕排成一列 */
+#categoryList li .category-actions {
+    display: inline-flex;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+/* 預設狀態：隱藏編輯相關的控制項 */
+#categoryList li .edit-input,
+#categoryList li .btn-save,
+#categoryList li .btn-cancel {
+    display: none;
+}
+
+/* 編輯狀態 (.editing)：顯示編輯控制項，並隱藏一般狀態的元素 */
+#categoryList li.editing .edit-input,
+#categoryList li.editing .btn-save,
+#categoryList li.editing .btn-cancel {
+    display: inline-flex;
+}
+
+#categoryList li.editing .category-name,
+#categoryList li.editing .btn-edit,
+#categoryList li.editing .btn-danger {
+    display: none;
+}
+
+/* 為編輯輸入框設定樣式 */
+#categoryList .edit-input {
+    background: #0b1220;
+    border: 1px solid var(--accent); /* 編輯時高亮邊框 */
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
 #newCategoryForm { display: flex; gap: 10px; margin-top: 20px; }
 .muted { color: var(--muted); }
-
-/* --- 頁尾 --- */
-.footer { color: var(--muted); font-size: 12px; text-align: center; margin: 24px 0 40px; }
-
-/* --- 【更新】主佈局 --- */
-.main-layout {
-    display: grid;
-    /* 定義兩欄的寬度比例，左欄 1, 右欄 2.5 */
-    grid-template-columns: 1fr 2.5fr; 
-    gap: 24px; /* 欄位之間的間距 */
-    align-items: start;
-}
 
 /* 左側欄內的面板垂直排列 */
 .layout-aside {
@@ -274,3 +317,4 @@ tbody td.row-tools { vertical-align: bottom; }
     border-radius: 4px;
     font-weight: 500;
 }
+
