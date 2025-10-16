@@ -79,7 +79,7 @@
         </main>
     </div>
 
-    <p class="footer">© 2025 品質處 Prompt Library – 雲端協作版</p>
+    <p class="footer">© 2025 品質管理處(QMD) Prompt Library – 雲端協作版</p>
   </div>
 
   <div class="modal-overlay" id="promptModal"><div class="modal-container"><div class="modal-header"><h3 id="modalTitle"></h3><button class="close-btn">&times;</button></div><div class="modal-content"><form id="promptForm"><input type="hidden" id="promptId"><div class="form-group"><label for="taskInput">任務目標</label><input type="text" id="taskInput" required></div><div class="form-group"><label for="categoryInput">分類</label><select id="categoryInput" required></select></div><div class="form-group"><label for="promptInput">Prompt 詞</label><textarea id="promptInput" rows="10" required></textarea></div><div id="historyPreviewContainer" style="display: none;"><label>歷史版本預覽 (唯讀)</label><textarea id="historyPreviewArea" readonly></textarea><div style="margin-top: 8px; display: flex; gap: 8px;"><button type="button" id="restoreBtn" class="btn small btn-action">還原此版本</button><button type="button" id="closePreviewBtn" class="btn small ghost">關閉預覽</button></div></div><div class="form-group" style="margin-top: 16px;"><label for="authorInput">建立者 / 修改者</label><input type="text" id="authorInput" required></div><div class="modal-footer"><select id="historySelect" class="small history-select" disabled></select><button type="button" class="btn" id="saveBtn">儲存</button></div></form></div></div></div>
@@ -103,6 +103,7 @@
   <script src="./app.js" defer></script>
 </body>
 </html>
+
 
 
 
