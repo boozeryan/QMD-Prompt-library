@@ -367,9 +367,9 @@ class PromptLibraryApp {
     });
     addNewBtn.addEventListener('click', () => this._openPromptModal('add'));
     manageCategoriesBtn.addEventListener('click', () => {
-      this._renderCategoryList();
-      this._openModal(categoryModal);
-    });
+  this._renderCategoryList();
+  this._openModal(this.elements.categoryModal.self);
+});
     exportBtn.addEventListener('click', () => this._exportData());
     importBtn.addEventListener('click', () => fileImporter.click());
     fileImporter.addEventListener('change', e => this._handleFileImport(e));
@@ -859,4 +859,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = new PromptLibraryApp();
   app.init();
 });
+
 
