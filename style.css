@@ -283,7 +283,14 @@ tbody td.row-tools { vertical-align: bottom; }
 
 #newCategoryForm { display: flex; gap: 10px; margin-top: 20px; }
 .muted { color: var(--muted); }
-
+/* --- 主佈局 --- */
+.main-layout {
+    display: grid;
+    /* 定義兩欄的寬度比例，左欄 1, 右欄 2.5 */
+    grid-template-columns: 1fr 2.5fr; 
+    gap: 24px; /* 欄位之間的間距 */
+    align-items: start;
+}
 /* 左側欄內的面板垂直排列 */
 .layout-aside {
     display: grid;
@@ -317,4 +324,5 @@ tbody td.row-tools { vertical-align: bottom; }
     border-radius: 4px;
     font-weight: 500;
 }
+
 
